@@ -1,0 +1,2 @@
+DB_DRIVER: sqlite
+DB_DATABASE: /home/quinn/spatial-cimis/gdb/cimis/PERMANENT/sqlite.db

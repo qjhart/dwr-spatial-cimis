@@ -1,0 +1,9 @@
+COMMAND: v.in.ogr input="california_counties.shp" output="california_counties" min_area=0.0001 type="" snap=-1
+GISDBASE: /home/quinn/gdb
+LOCATION: solar MAPSET: PERMANENT USER: quinn DATE: Wed Jul 18 10:17:25 2018
+-----------------------------------------------------
+179 input polygons
+Total area: 4.10563E+11 (179 areas)
+Overlapping area: 0 (0 areas)
+Area without category: 0 (0 areas)
+---------------------------------------------------------------------------------
