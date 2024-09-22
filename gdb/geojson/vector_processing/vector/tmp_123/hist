@@ -1,0 +1,8 @@
+COMMAND: v.in.ogr input="tmp_123.geojson" output="tmp_123" min_area=0.0001 type="" snap=-1
+GISDBASE: /home/quinn/dwr-spatial-cimis/gdb
+LOCATION: geojson MAPSET: vector_processing USER: quinn DATE: Sun Sep 22 11:36:10 2024
+-----------------------------------------------------
+1 input polygons
+Total area: 2.18013E+09 (1 areas)
+Overlapping area: 0 (0 areas)
+Area without category: 0 (0 areas)
