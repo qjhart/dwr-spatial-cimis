@@ -1,0 +1,87 @@
+* Zipcode processing comparisons
+
+You would imagine that keeping up-to-date with zipcodes would be an easy task.
+However, it's actually not for a number of reasons.  The primary reason is that
+historically, the USPS maintains basically that zipcode boundaries aren't
+really polygons, they might not even be static.  An old, but useful desciption
+is found in the [[https://manifold.net/doc/mfd9/index.htm#zip_codes_are_not_areas.htm][Manifold Documentation]].  This document also includes a
+description of the CENSUS ZIP Code Tabulation Areas (ZCTAs).  This is the only
+real federally official association of zipcodes with areas. However, as the
+document points out, there is no gaurentee that all of california would be
+covered with these areas, The current/old zip_2012 actually showed that
+consideration in it's raster imagery.
+
+Alternatively, in 2024, the USPS has started to come around to the idea of
+producing their own polygons, see for example this [[https://postalpro.usps.com/Beyond_Mail_New_Products][Announcement of new products]],
+and this [[https://about.usps.com/who/government-relations/assets/postal-101-zip-codes.pdf][memo]] about their review practices.  However, it's not clear if
+they plan on charging users for updates.  As of now, they don't seem to have any
+product.
+
+** CA State Geoportal
+
+CA state goverment maintains their geoportal. There is one [[https://gis.data.ca.gov/datasets/dea966d601934f49b9a0e1668182801b_0/explore][zipcode]] layer on that
+site.  I choose this since presumably, its consistant for State usage.  However,
+the data is from 2019, and the metadata about it's creation is a bit sketchy.
+
+** ESRI Arc Map
+It's been suggested that we use ESRI's zipcode layer. This has been updated the
+most recently.  However, an investigation into this layer indicates the polygons
+are are a commericial firm, tom-tom, and I'm not sure about the licensing of
+that data.
+
+** ZCTAs
+#+ORG-IMAGE-ACTUAL-WIDTH: 125px
+
+This data is available from the [[https://catalog.data.gov/dataset/tiger-line-shapefile-2022-nation-u-s-2020-census-5-digit-zip-code-tabulation-area-zcta5][census]].  It comes out every census update (not
+the detailed 10yr ones, but the statistical ones).  The latest is from [[https://www2.census.gov/geo/tiger/TIGER2022/ZCTA520/tl_2022_us_zcta520.zip][2022]],
+with zipcode data from 2020.  As discussed above, these are not complete
+coverages of California. However, if the users of these data are truly in these
+zipcodes, the summaries are probably more accurate since they don't include,
+eg. federal land with potentially fairly different ETo values.
+
+You can see that in urban/suburban areas, the regions are more like a standard
+coverage.
+
+| Region        | US Census zcta         | DOE zipcode coverage      |
+|---------------+------------------------+---------------------------|
+| CA            | [[file:zcta_full.jpg]]     | [[file:zipcode_full.jpg]]     |
+| Central Vally | [[file:zcta_cv.jpg]]       | [[file:zipcode_cv.jpg]]       |
+| South Bay     | [[file:zcta_southbay.jpg]] | [[file:zipcode_southbay.jpg]] |
+
+
+These are the steps we'd use to incorporate that into our system, start with
+~grass gdb/cimis/PERMANENT~
+
+#+begin_src bash
+  zcta=tl_2022_us_zcta520
+  wget https://www2.census.gov/geo/tiger/TIGER2022/ZCTA520/${zcta}.zip
+  unzip ${zcta}.zip
+  g.mapset -c location=cimis mapset=zcta
+  # Read in vector data
+  v.in.ogr input=${zcta}.shp location=zcta
+  # Project to our location, use sqllite to adjust the values in the final raster
+  eval $(g.gisenv)
+  db.connect driver=sqlite database="$GISDBASE/$LOCATION_NAME/$MAPSET/sqlite.db"
+  v.proj input=${zcta} location=zcta mapset=PERMANENT
+#+end_src
+
+Now we need to create a long integer for our raster files
+
+  #+begin_src bash
+    v.db.addcolumn map=${zcta} columns="zip5 BIGINT"
+    v.db.update map=${zcta} column=zip5 query_column="CAST(ZCTA5CE20 AS BIGINT)"
+  #+end_src
+
+  Now we can convert this to a raster. The values for the raster will be the
+  actual zipcode, but since some (like 00051) show up in that case like 51,
+  we'll also add a category set of the string versions.  This allows us to use
+  both formats.  This will go into an ever changing zcta raster in the PERMANENT
+  mapset.
+
+   #+begin_src bash
+     g.mapset mapset=500m
+     g.region -d
+     r.mask state
+     v.to.rast input=${zcta}@zcta type=area output=zcta \
+               use=attr attribute_column=zip5 label_column=ZCTA5CE20 --overwrite
+   #+end_src
