@@ -1,0 +1,10 @@
+name: unnamed
+a: 6378137
+es: 0.006694380022900787
+proj: geos
+sweep: x
+lon_0: -137
+h: 35786023
+x_0: 0
+y_0: 0
+no_defs: defined
