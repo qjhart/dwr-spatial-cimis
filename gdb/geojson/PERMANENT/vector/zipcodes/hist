@@ -1,0 +1,8 @@
+COMMAND: v.in.ogr input="/home/quinn/Downloads/zipcodes.geojson" min_area=0.0001 type="" snap=0.0000001 location="geojson"
+GISDBASE: /home/quinn/spatial-cimis/gdb
+LOCATION: geojson MAPSET: PERMANENT USER: quinn DATE: Tue Sep 17 20:30:04 2024
+-----------------------------------------------------
+1953 input polygons
+Total area: 4.09481E+11 (1955 areas)
+Overlapping area: 0 (0 areas)
+Area without category: 14463.5 (2 areas)
