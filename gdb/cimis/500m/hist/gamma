@@ -1,0 +1,9 @@
+Tue Oct  8 22:41:01 2024
+gamma
+500m
+quinn
+raster
+Crop evapotranspiration - FAO Irrigation and drainage paper 56
+Equations: 7 & 8
+psychrometric constant
+0.000665 * (101.3 * pow((293 - 0.0065 * Z) / 293, 5.26))
