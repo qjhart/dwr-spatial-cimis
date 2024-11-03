@@ -1,0 +1,20 @@
+* GOES-18 Test
+
+* Running the container
+
+** Locally
+
+*** via MAPSET
+
+#+begin_src bash
+  docker run --rm -e LOCAL_USER_ID=$(id --user) \
+         -e MAPSET=20230627 -v ./gdb:/grassdb \
+         localhost/dwr-spatial-cimis/goes18:dirty
+#+end_src
+
+*** via START_DATE and BATCH_TASK_INDEX
+
+
+** Google Batch
+
+*** Configuration
