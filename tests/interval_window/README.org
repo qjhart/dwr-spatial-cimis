@@ -1,0 +1,38 @@
+* Greatest accurate (enough) interval
+
+In the process of investigating the current solar calculations, with an eye
+towards eliminating the Makefile based processing, I have created two new grass
+commands.  [r.iheliosat](https://github.com/qjhart/r.iheliosat) will create some
+daily files (like sunrise time) and will also create time integrated clear-sky
+solar radiation estimates. Unlike the current setup, this neither requires nor
+creates any intermediate files, and as a result is much smaller output than the
+current solar calculations.
+
+I have combined this with another new grass command,[[https://github.com/qjhart/g.cimis.daily_solar.git][g.cimis.daily_solar]], which
+calculates the cloud masked solar radiation for any day with a mapset following
+the Spatial CIMIS standard.  This also produces far less intermediate files, by
+default only saving the day’s; Rs, Rso, and K factors, and the surface albedo
+for every time in the day.  I’ve verified this works by comparing the output to
+the current radiation for a week’s worth of data in July 2024.
+
+These changes allowed me to more easily investigate the impact of the default
+daily interval for calculating cloud cover.  We currently include inputs for
+every 5 mins of the day, but this is overkill.  The example below shows various
+intervals for 20240714.  This was the most clouded July image.  Figure 1 shows
+the K factor for this day.
+
+| 20240714 K factor   |
+|---------------------|
+| [[file:20240714_K.jpg]] |
+
+
+Figure 2 shows the change in K factor as a function of the interval time.
+Although this is only one day, we can probably move to a 20 min interval without
+incurring too much of a degradation in estimate.  This is important when
+considering using an internet source for the GOES data.  This figure was made
+with this [[https://docs.google.com/spreadsheets/d/1Kr1t0HCZ9XF2vggWFrG34bWoOOoXf8_iYswbjcWB_VY/edit?gid=0#gid=0][Google Spreadsheet]], using the CSV files in this directory.  This
+summary also appeared in this [[https://docs.google.com/document/d/1V508hw7eIEtaAAnX54gYhy8AZChMmp1-VO67aUMvJI0/edit?tab=t.0][Google Doc]].
+
+| Absolute change in K value for different interval lengths for 20240714 |
+|------------------------------------------------------------------------|
+| [[file:dK_per_interval.png]]                                               |
