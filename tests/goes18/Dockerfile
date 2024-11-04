@@ -36,7 +36,7 @@ ENV GISDBASE=/grassdb
 ENV PROJECT=cimis
 ENV MAPSET=PERMANENT
 
-#VOLUME /var/tmp
+VOLUME /var/tmp
 VOLUME /grassdb
 
 
