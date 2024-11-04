@@ -80,10 +80,10 @@ if [ $GIS_FLAG_B -eq 1 ] ; then
    mapset=$(date --date="${MAPSET} +${BATCH_TASK_INDEX} days" +%Y%m%d)
   G_verify_mapset ${mapset}
   GBL[MAPSET]=${mapset}
+  g.mapset mapset=${GBL[MAPSET]}
+else
+  G_verify_mapset ${GBL[MAPSET]}
 fi
-
-G_verify_mapset ${GBL[MAPSET]}
-g.mapset mapset=${GBL[MAPSET]}
 # Get GOES data from cloud
 g.cimis.daily_solar
 # Calculate new BVEto
