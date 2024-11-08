@@ -168,7 +168,6 @@ Rs_rms@20230131) / 28)'
 Again, the [[file:r.eto.sh][r.eto.sh]], can be made to run this summary.
 
 *** Summary
-
 **** 2023-01 through 2023-04
 There were no large errors between the methods in this time frame.  If you did
 look at the monthly =rmse28= values, however, there were some strange
@@ -182,7 +181,9 @@ You get a different result than that.  This in in the GOES images.  However, by
 | 2023-01-31 Rs RMSE 28 days         | 2023-02-28 Rs RMSE 28 days         |
 #+ATTR_HTML: :width 150px
 
-**** 2023-04-26 Image problems
+**** 2023-04-26/2023-06-20 Image problems [FIXED]
+
+These issues were fixed with an update of g.cimis.daily_solar
 
 Another problem started showing  up in April, where parts of  the B2 images were
 not coming through on the cloud images.  The first example what on 2023-04-26 in

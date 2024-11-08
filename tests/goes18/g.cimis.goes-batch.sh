@@ -88,9 +88,9 @@ fi
 g.cimis.daily_solar
 # Calculate new BVEto
 if [[ ${GBL[mapset]} =~ 01$ ]] ; then
-  r.eto -f
+  r.eto -f -e
 else
-  r.eto
+  r.eto -f
 fi
 
 
