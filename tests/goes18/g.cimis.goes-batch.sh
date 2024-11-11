@@ -13,8 +13,7 @@
 #
 #############################################################################
 # Change to 3 for working
-DEBUG=0
-
+DEBUG=3
 #%Module
 #%  description: Calculate ETo from GOES 18 satellite data and CIMIS data
 #%  keywords: CIMIS evapotranspiration
@@ -93,7 +92,8 @@ else
   r.eto -f
 fi
 
-
 # Reset to original mapset
-g.mapset mapset=${GBL[SAVE_MAPSET]}
+if [[ ${GBL[MAPSET]} != ${GBL[SAVE_MAPSET]} ]] ; then
+  g.mapset mapset=${GBL[SAVE_MAPSET]}
+fi
 exit 0

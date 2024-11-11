@@ -13,7 +13,7 @@
 #
 #############################################################################
 # Change to 3 for working
-DEBUG=0
+DEBUG=3
 
 #%Module
 #%  description: Calculate ETo from GOES 18 satellite data and CIMIS data
@@ -55,7 +55,7 @@ function ETo() {
 
 function rsm() {
   local m=$1
-  r.mapcalc --overwrite expression="${m}_rms=(${m}-${m}_dish)^2";
+  r.mapcalc --overwrite --quiet expression="${m}_rms=(${m}-${m}_dish)^2";
 }
 
 # Get the last 28 days for the matching filename.  We use this to get the
@@ -117,15 +117,19 @@ fi
 
 G_verify_mapset
 
+g.message -v message="Calculating Rnl / ETo for ${GBL[MAPSET]}"
+Rnl
+ETo
+
+g.message -v message="Calculating [Rs|K|ETo]_rsm ${GBL[MAPSET]}"
+for m in Rs K ETo; do
+  rsm $m
+done
+
 if [ $GIS_FLAG_E -eq 1 ]; then
+  g.message -v message="Calculating [Rs|K|ETo]_rmse28 ${GBL[MAPSET]}"
   for m in Rs K ETo; do
     rmse28 $m
   done
   exit 0
 fi
-
-Rnl
-ETo
-for m in Rs K ETo; do
-  rsm $m
-done

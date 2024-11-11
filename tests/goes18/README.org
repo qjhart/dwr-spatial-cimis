@@ -183,7 +183,10 @@ You get a different result than that.  This in in the GOES images.  However, by
 
 **** 2023-04-26/2023-06-20 Image problems [FIXED]
 
-These issues were fixed with an update of g.cimis.daily_solar
+These issues were fixed with an update of g.cimis.daily_solar.  Errors like this
+also happened on 20230620, 20230804, 20230821,20231017,20231127,20240225,202403
+
+20231231 had a problem, where no images after sunset appear.
 
 Another problem started showing  up in April, where parts of  the B2 images were
 not coming through on the cloud images.  The first example what on 2023-04-26 in

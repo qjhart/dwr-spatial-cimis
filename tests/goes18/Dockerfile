@@ -4,7 +4,7 @@ ARG GRASS_TAG=releasebranch_8_4-debian
 
 FROM osgeo/grass-gis:${GRASS_TAG} as grass
 ARG R_IHELIOSAT_VERSION=1.2.0
-ARG G_CIMIS_DAILY_SOLAR_VERSION=2.0.1
+ARG G_CIMIS_DAILY_SOLAR_VERSION=2.0.2
 ARG ARC=https://github.com/qjhart
 
 RUN apt update && apt install -y \
