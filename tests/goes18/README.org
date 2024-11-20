@@ -366,10 +366,13 @@ this case, if the actual station data has changed since the data was first run.
 
 ** 2023 / 2024 RMSE28
 
-One way to verify that
+One way to verify the ETo process is to summarize about a month's worth (28 days) of ETo
+errors between the cloud process and the original.  The following table shows
+these summaries for 2023 and 2024.  Why the patterns for the errors can vary so
+much from month to month is still unclear.
 
 |-------------------------------------+-------------------------------------+-------------------------------------|
-| [[file:images/20230401_rmse28.jpg]]     | [[file:images/20230501_ETo_rmse28.jpg]] | [[file:images/20230601_ETo_rmse28.jpg]] |
+| [[file:images/20230401_ETo_rmse28.jpg]] | [[file:images/20230501_ETo_rmse28.jpg]] | [[file:images/20230601_ETo_rmse28.jpg]] |
 | 20230401_ETo_rmse28                 | 20230501_ETo_rmse28                 | 20230601_ETo_rmse28                 |
 | [[file:images/20230701_ETo_rmse28.jpg]] | [[file:images/20230801_ETo_rmse28.jpg]] | [[file:images/20230901_ETo_rmse28.jpg]] |
 | 20230701_ETo_rmse28                 | 20230901_ETo_rmse28                 | 20230901_ETo_rmse28                 |
