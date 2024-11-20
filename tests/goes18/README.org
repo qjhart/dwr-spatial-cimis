@@ -363,3 +363,27 @@ runnging the above Symsoft test).
 
 Then you can refetch the station data. Some non-minor differences could occur in
 this case, if the actual station data has changed since the data was first run.
+
+** 2023 / 2024 RMSE28
+
+One way to verify the ETo process is to summarize about a month's worth (28 days) of ETo
+errors between the cloud process and the original.  The following table shows
+these summaries for 2023 and 2024.  Why the patterns for the errors can vary so
+much from month to month is still unclear.
+
+|-------------------------------------+-------------------------------------+-------------------------------------|
+| [[file:images/20230401_ETo_rmse28.jpg]] | [[file:images/20230501_ETo_rmse28.jpg]] | [[file:images/20230601_ETo_rmse28.jpg]] |
+| 20230401_ETo_rmse28                 | 20230501_ETo_rmse28                 | 20230601_ETo_rmse28                 |
+| [[file:images/20230701_ETo_rmse28.jpg]] | [[file:images/20230801_ETo_rmse28.jpg]] | [[file:images/20230901_ETo_rmse28.jpg]] |
+| 20230701_ETo_rmse28                 | 20230901_ETo_rmse28                 | 20230901_ETo_rmse28                 |
+| [[file:images/20231001_ETo_rmse28.jpg]] | [[file:images/20231101_ETo_rmse28.jpg]] | [[file:images/20231201_ETo_rmse28.jpg]] |
+| 20231001_ETo_rmse28                 | 20231101_ETo_rmse28                 | 20231201_ETo_rmse28                 |
+| [[file:images/20240101_ETo_rmse28.jpg]] | [[file:images/20240201_ETo_rmse28.jpg]] | [[file:images/20240301_ETo_rmse28.jpg]] |
+| 20240101_ETo_rmse28                 | 20240201_ETo_rmse28                 | 20240301_ETo_rmse28                 |
+| [[file:images/20240401_ETo_rmse28.jpg]] | [[file:images/20240501_ETo_rmse28.jpg]] | [[file:images/20240601_ETo_rmse28.jpg]] |
+| 20240401_ETo_rmse28                 | 20240501_ETo_rmse28                 | 20240601_ETo_rmse28                 |
+| [[file:images/20240701_ETo_rmse28.jpg]] | [[file:images/20240801_ETo_rmse28.jpg]] | [[file:images/20240901_ETo_rmse28.jpg]] |
+| 20240701_ETo_rmse28                 | 20240801_ETo_rmse28                 | 20240901_ETo_rmse28                 |
+|                                     |                                     |                                     |
+
+#+ATTR_HTML: :width 150px

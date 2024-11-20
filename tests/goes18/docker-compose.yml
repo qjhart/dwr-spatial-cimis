@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-bookworm
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: goes
+    volumes:
+#      - ./db/initdb.d:/docker-entrypoint-initdb.d
+      - db:/var/lib/postgresql/data
+    ports:
+      - ${PORT:-5432}:5432
+
+volumes:
+  db:
+    driver: local
