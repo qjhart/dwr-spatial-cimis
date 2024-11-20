@@ -1,0 +1,311 @@
+* Current / Previous API
+
+As far as I know, the current API is still the one identified at
+[[https://et.water.ca.gov/]].  This API combines both the station data, the zipcode
+data, and individual point data.  The API also responds in both XML and JSON.  I
+also believe that application keys are required for every request.
+
+In practice, my understanding is that this API uses DWR's oracle server for all
+requests, save the point requests, which are retrieved from another http
+interface that DWR's dish processing services has.  This used to be an old WKS
+service format, which is very hard to understand.  There is an application that
+collects the zipcode data from the Spatial CIMIS server on a nightly basis, and
+then imports that into an Oracle data table.  Otherwise, Spatial CIMIS doesn't
+support zipcode queries.
+
+| [[file:images/current.png]] |
+|-------------------------|
+| Current API framework   |
+
+
+The API allows for the data to be supplied in English and metric units.  The
+Spatial CIMIS server only ever responded in metric units, so I assume that the
+application on the et.water.ca.gov server has additional logic for that
+calculation.  The API also supposededly has a address lookup.  I've never used
+this, so I don't know how good that works.  In general, the application at
+et.water.ca.gov is probably pretty sophisticated.
+
+Note that spatial cimis uses that same API, via the v.in.et interface to get the
+station data for the starting the station interpolation.  Similarly,
+et.water.ca.gov also gets the zipcode csv files via the apache interface on the
+Spatial CIMIS servers.
+
+The current API predates the OpenAPI specification, but section [[*Current Approximate OpenAPI Specification][Current
+Approximate OpenAPI Specification]] shows an approximation to that specification.
+
+* Symsoft Proposed API Updates
+
+I haven't seen a complete proposed API specification from Symsoft for the new
+server.  Symsoft *is* providing new client services, particularly for dynamic
+area calculations.  That implementation has been discussed.  The conversion of
+an API specification for that was discussed, but not finalized.  However, given
+that it's clear there will be some modifications to the existing API.  In
+addition, I haven't been involved in any conversations about how the new system
+will support the existing APIs used by CIMIS.
+
+* Potential Integration Paths
+
+There are a number of different potential implementations that can be pursued.
+
+** Keep et.water.ca.gov intact
+In this method, don't alter the processing on et.water.ca.gov.  This would leave
+the existing API in place, with no additional programming.  However, there are a
+numberr of cons to this path.  1) the existing WKS httpd endpoint would need to
+be replicated in the new processing.  This would also require an additional
+httpd server in the docker setup. I'd imagine this would be a pure python
+implementation as opposed to an apache CGI, so the code would be quite
+different.  2) You couldn't update the existing code to add new API paths, so
+you'd need instead to have a second endpoint for new services. 3) How API
+requests are satisfied in this setup is pretty confusing.
+
+** Update et.water.ca.gov
+You could plan to update et.water.ca.gov as well.  This probably mean a rewrite
+of that existing code into python.  The con of this is it's a considerable
+amount of work.  The pros would be you could update the API so all services are
+on the endpoint.  You could also move that endpoint into the docker
+constellation setup, as long as you could get access to the DWR Oracle database
+for fetching station data.
+
+More than likely, you'd also need to run your own verison of postgres, or
+something similar to replicate things like the hourly data, although a robust
+connection to the oracle database might be sufficient.
+
+** Reimplement the API
+In this method, you would imagine a new API for data access. You could simplify
+a number of the current decisions made in the API (eg eliminate XML formats).
+The big downside to this is that you would need to communicate these changes to
+your current clients.
+
+
+* Current Approximate OpenAPI Specification
+
+The following JSON is an approximate representation of the current CIMIS API,
+specified at et.water.ca.gov
+
+#+begin_src json
+  {
+  "openapi": "3.0.3",
+  "info": {
+    "title": "CIMIS Weather Data API",
+    "description": "The CIMIS API provides access to weather data from the California Irrigation Management Information System (CIMIS), including daily and hourly weather data for WSN and SCS stations.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://et.water.ca.gov/api",
+      "description": "Production Server"
+    }
+  ],
+  "paths": {
+    "/data": {
+      "get": {
+        "summary": "Retrieve Weather Data",
+        "description": "Fetch weather data based on specified parameters such as targets, date range, and data items.",
+        "parameters": [
+          {
+            "name": "appKey",
+            "in": "query",
+            "required": true,
+            "description": "Unique application key issued to registered users.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "targets",
+            "in": "query",
+            "required": true,
+            "description": "Comma-separated list of targets. Supports station IDs, zip codes, coordinates, or street addresses.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "2, 80, 127"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": true,
+            "description": "Start date in yyyy-mm-dd format.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-01-01"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": true,
+            "description": "End date in yyyy-mm-dd format.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-12-31"
+          },
+          {
+            "name": "unitOfMeasure",
+            "in": "query",
+            "required": false,
+            "description": "Unit of measurement. 'E' for English, 'M' for Metric.",
+            "schema": {
+              "type": "string",
+              "enum": ["E", "M"],
+              "default": "E"
+            }
+          },
+          {
+            "name": "dataItems",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated list of data elements. Choose from daily or hourly data items.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "day-air-tmp-avg", "day-air-tmp-min", "day-dew-pnt", "day-eto",
+                  "day-asce-eto", "day-asce-etr", "day-precip", "day-rel-hum-avg",
+                  "day-rel-hum-max", "day-rel-hum-min", "day-soil-tmp-avg",
+                  "day-soil-tmp-max", "day-soil-tmp-min", "day-sol-rad-avg",
+                  "day-sol-rad-net", "day-vap-pres-max", "day-vap-pres-avg",
+                  "day-wind-ene", "day-wind-ese", "day-wind-nne", "day-wind-nnw",
+                  "day-wind-run", "day-wind-spd-avg", "day-wind-ssw",
+                  "day-wind-wnw", "day-wind-wsw",
+                  "hly-air-tmp", "hly-dew-pnt", "hly-eto", "hly-net-rad",
+                  "hly-asce-eto", "hly-asce-etr", "hly-precip", "hly-rel-hum",
+                  "hly-res-wind", "hly-soil-tmp", "hly-sol-rad", "hly-vap-pres",
+                  "hly-wind-dir", "hly-wind-spd"
+                ]
+              },
+              "style": "form",
+              "explode": false
+            },
+            "example": "day-air-tmp-avg,day-precip,hly-wind-spd"
+          },
+          {
+            "name": "prioritizeSCS",
+            "in": "query",
+            "required": false,
+            "description": "Prioritize SCS data when querying zip codes. 'Y' or 'N'.",
+            "schema": {
+              "type": "string",
+              "enum": ["Y", "N"],
+              "default": "Y"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with requested weather data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    { "$ref": "#/components/schemas/DailyData" },
+                    { "$ref": "#/components/schemas/HourlyData" }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid parameters or missing required fields.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DailyData": {
+        "type": "object",
+        "properties": {
+          "stationId": {
+            "type": "string",
+            "description": "Identifier for the weather station."
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "description": "The date of the data record."
+          },
+          "day-air-tmp-avg": {
+            "type": "number",
+            "description": "Average air temperature."
+          },
+          "day-precip": {
+            "type": "number",
+            "description": "Daily precipitation."
+          },
+          "day-sol-rad-avg": {
+            "type": "number",
+            "description": "Average solar radiation."
+          }
+        }
+      },
+      "HourlyData": {
+        "type": "object",
+        "properties": {
+          "stationId": {
+            "type": "string",
+            "description": "Identifier for the weather station."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the data record."
+          },
+          "hly-air-tmp": {
+            "type": "number",
+            "description": "Hourly air temperature."
+          },
+          "hly-wind-spd": {
+            "type": "number",
+            "description": "Hourly wind speed."
+          },
+          "hly-sol-rad": {
+            "type": "number",
+            "description": "Hourly solar radiation."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Error status."
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message."
+          },
+          "code": {
+            "type": "integer",
+            "description": "HTTP status code."
+          }
+        }
+      }
+    }
+  }
+}
+
+#+end_src
