@@ -1,0 +1,24 @@
+services:
+  db:
+    image: us-west1-docker.pkg.dev/digital-ucdavis-edu/pub/postgres:16
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: cimis
+    volumes:
+      - ./db/initdb.d:/docker-entrypoint-initdb.d
+      - db:/var/lib/postgresql/data
+    ports:
+      - ${PORT:-5432}:5432
+  # fuseki:
+  #   image: us-west1-docker.pkg.dev/aggie-experts/docker/fuseki:2.0.0
+  #   volumes:
+  #     - fuseki-data:/var/lib/fuseki
+  #   ports:
+  #     - 3030:3030
+
+
+volumes:
+  db:
+    driver: local
+  # fuseki-data:
+  #   driver: local

@@ -1,0 +1,82 @@
+* Initialize Database
+#+PROPERTY: header-args:sql :engine postgresql :cmdline "service=cimis" :tangle yes
+
+** Initialization
+
+*** CIMIS
+
+    Let's create a placeholder schema for our generic tables definitions.
+    Later, we can either alter this, or use as input for our new schema, based
+    on the CMS choosen.
+
+
+ #+BEGIN_SRC sql
+ drop schema if exists cimis cascade;
+ create schema cimis;
+ #+END_SRC
+
+ #+RESULTS:
+ | DROP SCHEMA   |
+ |---------------|
+ | CREATE SCHEMA |
+
+
+
+ #+BEGIN_SRC sql
+   drop table if exists cimis.zip_et0 cascade;
+   create table cimis.zip_et0 (
+   zipcode char(5),
+   eto float,
+   k float,
+   eto_rms float,
+   ymd date,
+   doy integer
+   );
+ #+END_SRC
+
+ #+RESULTS:
+ | DROP TABLE   |
+ |--------------|
+ | CREATE TABLE |
+
+*** Copy data
+
+    Right now, delete some obviously bad records, so we don't see problems that
+    aren't there.  Remove later
+
+    #+begin_src sql
+      truncate cimis.zip_et0;
+      copy cimis.zip_et0 from '/docker-entrypoint-initdb.d/avg_by_zip.csv' with csv header;
+    #+end_src
+
+    #+RESULTS:
+    | TRUNCATE TABLE |
+    |----------------|
+    | COPY 1003848   |
+
+
+*** Default Search Path
+
+ Add cimis to search path.
+
+ #+BEGIN_SRC sql
+ alter database :DBNAME set search_path to public,cimis;
+ #+END_SRC
+
+ #+RESULTS:
+ | ALTER DATABASE |
+ |----------------|
+
+ select * from zip_et0 where zipcode='89060' and extract(month from ymd)=7 order
+ by eto_rms desc;
+ select * from zip_et0 where zipcode='89060' and extract(month from ymd)=7;
+
+ with m as (select *,extract(month from ymd) as month from zip_et0),
+
+ av as (select zipcode,month,avg(eto) as eto,avg(k) as k,avg(eto_rms) as eto_rms from m group by month,zipcode)
+select * from av where zipcode='89060' order by eto_rms desc;
+
+
+with m as (select *,extract(month from ymd) as month from zip_et0),
+av as (select zipcode,month,avg(eto) as eto,avg(k) as k,avg(eto_rms) as eto_rms from m group by month,zipcode)
+select * from av where zipcode='89060' order by eto_rms desc;
