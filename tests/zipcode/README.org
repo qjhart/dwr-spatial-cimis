@@ -1,0 +1,451 @@
+* Zipcode Tests
+#+PROPERTY: header-args:sql :engine postgresql :cmdline "service=zipcode" :tangle yes
+
+One way we can look at the changes that updating to the GOES18 data, can be to
+track the differences in deltaETo.  We can look at the changes on a map, but
+they can be pretty small.  We can use our new zcta zipcode layer, and focus more
+on the changes in the agricultural regions, and also see if the distribtion in
+changes is greater in any particular part of the state.
+
+#+begin_src bash
+  csv="../../avg_by_zip.csv"
+  # Write header
+  echo "zipcode,eto,k,eto_rms,date,doy" > "$csv"
+  for date in 202?????; do
+      echo "Processing $date..."
+      r.stats.zonal --overwrite cover=ETo_rms@${date}  base=zcta@500m method=average output=_tmp_ETo_rms 2>/dev/null
+      r.stats.zonal --overwrite cover=ETo@${date}  base=zcta@500m method=average output=_tmp_ETo 2>/dev/null
+      r.stats.zonal --overwrite cover=K@${date}  base=zcta@500m method=average output=_tmp_K 2>/dev/null
+      r.stats.zonal --overwrite cover=ETo_dish@${date}  base=zcta@500m method=average output=_tmp_ETo_dish 2>/dev/null
+      r.stats.zonal --overwrite cover=K_dish@${date}  base=zcta@500m method=average output=_tmp_K_dish 2>/dev/null
+
+      # Parse date in YYYY-MM-DD, extract DOY and reformat to %Y%m%d
+      doy=$(date -d "${date}" +%j)
+      r.stats -1n separator=',' input=zcta@500m,_tmp_ETo,_tmp_K,_tmp_ETo_rms,_tmp_ETo_dish,_tmp_K_dish 2>/dev/null | sort -u | \
+          awk -v date="$date" -v doy="$doy" 'BEGIN { OFS="," } { print $1,date,doy }' \
+          >> "$csv"
+  done
+  echo "Saved: $csv"
+#+end_src
+
+We can then add this to a database, an easier way of comparing the ETo using
+both methods. For example, we can see zipcodes have the highest difference in
+ETo averaged over complete months.
+
+#+begin_src sql
+    with m as (select *,extract(month from ymd) as month from zip_et0),
+   av as (select zipcode,month,avg(eto) as eto,avg(k) as k,avg(eto_rms) as eto_rms
+  from m group by month,zipcode)
+  select * from av order by eto_rms desc limit 10;
+#+end_src
+
+#+RESULTS:
+| zipcode | month |                eto |                  k |             eto_rms |
+|---------+-------+--------------------+--------------------+---------------------|
+|   89060 |     5 |  8.561769056451613 | 0.9447138588709678 |  0.4236939569053226 |
+|   89061 |     5 |  8.378498477419354 | 0.9362229677419355 |  0.4204852635053225 |
+|   92384 |     5 |  8.247812261290324 |  0.955075636935484 |   0.417023355695645 |
+|   89019 |     5 |  8.208587411290322 |  0.937654030483871 |  0.4087846809516129 |
+|   92364 |     5 |  7.979569730645161 | 0.9357348275806452 | 0.40549597748048394 |
+|   92389 |     5 |  8.275942043548387 | 0.9545122346774193 |  0.4006439080953226 |
+|   89046 |     5 |  8.001164329032257 | 0.9517377783870968 |  0.3991807719933872 |
+|   89020 |     5 |   8.71340717580645 | 0.9406093729032259 |  0.3956641511908064 |
+|   92259 |     5 | 6.7790423967741935 | 0.9627067027419355 |  0.3955275181919355 |
+|   91934 |     5 |  5.946515890322581 | 0.9649911656451612 | 0.39545427417241935 |
+
+But a lot of these zipcodes, are just one or two pixels on the border of NV.  So
+instead, lets pick some zipcodes reprentative of California Ag.(via AI)
+
+🌾 Central Valley / San Joaquin Valley
+93670 – North Pixley (Tulare County)
+100% of workforce in farming/fishing/forestry 
+In the heart of Tulare County, one of the top agricultural counties 
+tonyajoy.com
+
+93623 – Earlimart (Tulare County)
+Also 100% agricultural workforce 
+Deep in Tulare’s intensive crop region
+
+93624 – Ivanhoe (Tulare/Fresno area)
+82–100% agricultural employment 
+Centrally located in prime cropland valley
+
+95606 – Courtland (Sacramento Delta / Yolo County)
+About 96.5% in ag work 
+Yolo County ranks top‑15 in farmland acreage 
+
+⚙️ Central Valley – Northern Stretch
+96031 – Cedarville (Modoc County)
+≈75% ag workforce 
+Modoc County has ~472k farmland acres 
+
+95595 – Whitethorn (Humboldt County)
+≈69% in ag sectors 
+Humboldt with ~406k farmland acres 
+
+🌾 Central Coast & Coastal Plain
+93429 – Nipomo (San Luis Obispo County)
+100% ag employment
+San Luis Obispo leads state in farmland (~1,028k acres) 
+
+93066 – Somis (Ventura County)
+ZIP covers extensive flat cropland; known for strawberries, citrus 
+Ventura is a top‑10 ag county 
+
+🍒 Southern California & Inland
+93551 – Leona Valley (Los Angeles County)
+Famous for cherries & wine grapes 
+
+91710 – Chino (San Bernardino County)
+Historically significant for dairy, fruit orchards, row crops 
+en.wikipedia.org
+
+#+begin_src sql
+    with ag(zipcode) as
+      (VALUES ('93670'),('93623'),('93624'),('95606'),('96031'),
+      ('95595'),('93429'),('93066'),('93551'),('91710')),
+    m as (select *,extract(month from ymd) as month from zip_et0),
+   av as (select zipcode,month,avg(eto) as eto,avg(k) as k,avg(eto_rms) as eto_rms
+  from m group by month,zipcode)
+  select * from av join ag using (zipcode) order by eto_rms desc limit 10;
+#+end_src
+
+#+RESULTS:
+| zipcode | month |                eto |                  k |             eto_rms |
+|---------+-------+--------------------+--------------------+---------------------|
+|   93551 |     5 |  5.553873027419354 | 0.9385544666129032 | 0.28859535616064513 |
+|   93624 |     5 |  6.052488325806451 | 0.9469997637096774 |  0.2732100177003226 |
+|   95606 |     5 |  5.198497938709677 | 0.9289813553225806 | 0.23345602860237094 |
+|   93623 |     5 |  4.460186524193548 | 0.8740907243548388 | 0.23033573252306455 |
+|   93429 |     5 |  3.493596379032258 | 0.8466216130645161 | 0.22628296887225807 |
+|   95595 |     5 |  4.531928241935483 | 0.9074318299999999 | 0.21088812092709677 |
+|   96031 |     5 | 4.2289322370967755 | 0.9011366438709678 | 0.20503864021403231 |
+|   91710 |     5 |  4.159588969354839 | 0.7838799820967742 |  0.2042179426004839 |
+|   93551 |     7 |  8.012827567741937 | 0.9738729262903226 | 0.19837354801451615 |
+|   93066 |     5 | 3.6567496225806457 | 0.7497561690322582 | 0.19729272940935488 |
+
+
+However, this actually shows that there are some days in the record that are
+just wrong.  See the section below [[*Bad Days][Bad Days]] for information on how we can try
+and find some other suspicious days, and remove them from our processing, and
+those examples show we have a number of bad days in our record.  These days
+*should* be fixed for sure, but we want to leave them out of our examples below.
+
+
+#+begin_src sql
+          with ag(zipcode) as
+            (VALUES ('93670'),('93623'),('93624'),('95606'),('96031'),
+            ('95595'),('93429'),('93066'),('93551'),('91710')),
+        bad(ymd) as
+        (VALUES ('2023-05-24'::date),('2024-03-14'),('2024-05-08'),('2024-05-23'),
+                ('2024-07-21'),('2024-09-15'),('2024-10-04')),
+          m as (select *,extract(month from ymd) as month from zip_et0),
+         av as (select zipcode,month,avg(eto) as eto,avg(k) as k,avg(eto_rms) as eto_rms
+        from m left join bad using(ymd)
+    where bad is null
+  group by month,zipcode)
+        select * from av join ag using (zipcode)
+    order by eto_rms desc limit 10;
+#+end_src
+
+When we remove those particular bad dates, we get lower differences
+
+#+RESULTS:
+| zipcode | month |                eto |                  k |              eto_rms |
+|---------+-------+--------------------+--------------------+----------------------|
+|   91710 |     1 | 1.7509118451612904 | 0.8990205077419354 |  0.02758283693737097 |
+|   93429 |     1 | 1.3281286209677419 | 0.9030012809677418 | 0.025608935836059357 |
+|   93066 |     1 |  1.669571554193548 | 0.9040163909677419 | 0.025305720611612906 |
+|   93551 |     1 | 1.7499293635483872 | 0.9169257809677419 | 0.020141366425652257 |
+|   93551 |     7 |   8.01104881967213 | 0.9738152127868852 |  0.01818414716229508 |
+|   91710 |     7 |  6.659860119672132 | 0.9676628337704919 | 0.018020058850819674 |
+|   95606 |     1 | 0.8189915251612904 |  0.823379156451613 |  0.01486163160270645 |
+|   95595 |     1 |  1.035553973548387 | 0.7784585638709677 | 0.014098704524216129 |
+|   93429 |     7 | 4.5764802754098355 | 0.9595840721311476 | 0.012806322530983606 |
+|   93624 |     7 |   8.06194384262295 | 0.9728172203278689 |  0.01221952955147541 |
+
+And now the average difference over the zipcode is more like about 0.15 mm. This
+is based on the difference in the K factor calculations for days that are a
+little bit cloudy, and in general slighty more cloudy days have a bigger difference.
+
+#+begin_src sql
+      select ymd,(eto-eto_dish)::decimal(6,2) as d_eto,eto,k,(k-k_dish)::decimal(6,2) as d_k from zip_et0
+     where zipcode='93551' and extract(month from ymd)=7 and ymd not in ('2024-07-21')
+     order by eto_rms desc,ymd,zipcode limit 10
+#+end_src
+
+#+RESULTS:
+|        ymd | d_eto |       eto |          k |  d_k |
+|------------+-------+-----------+------------+------|
+| 2024-07-17 |  0.34 | 7.2793798 |  0.9365232 | 0.09 |
+| 2024-07-12 |  0.26 | 7.1077805 | 0.83566535 | 0.06 |
+| 2024-07-02 |  0.24 | 7.4118471 | 0.98538697 | 0.06 |
+| 2024-07-03 |  0.18 | 7.9357581 | 0.98749715 | 0.04 |
+| 2024-07-18 |  0.18 | 7.8499575 | 0.99355817 | 0.05 |
+| 2024-07-05 |  0.18 | 8.3833485 | 0.98220384 | 0.04 |
+| 2023-07-20 |  0.17 | 8.2989845 | 0.99110514 | 0.04 |
+| 2024-07-13 |  0.17 | 7.9161658 | 0.97451729 | 0.04 |
+| 2024-07-15 |  0.17 | 7.4398556 | 0.99569541 | 0.04 |
+| 2023-07-31 |  0.16 | 7.3867431 | 0.78587478 | 0.04 |
+
+Alternatively we can count the days for each zipcode that have a range of
+differences.  This shows a significant zipcode areas with an average difference
+of .1-.2 [mm] and a smattering of days with a greater amount than that.
+
+#+begin_src sql
+  with ag(zipcode) as
+      (VALUES ('93670'),('93623'),('93624'),('95606'),('96031'),
+              ('95595'),('93429'),('93066'),('93551'),('91710')),
+    bad(ymd) as
+      (VALUES ('2023-05-24'::date),('2024-03-14'),('2024-05-08'),('2024-05-23'),
+      ('2024-07-21'),('2024-09-15'),('2024-10-04')),
+    d as (select abs(eto-eto_dish) as d,*
+  	  from  zip_et0 join ag using(zipcode)
+  		left join bad using (ymd)
+  	 where bad is null
+    ),
+    s(min) as (
+      select * from generate_series(0,1,0.1)
+    )
+  select zipcode,s.min,count(*)
+    from d,s
+   where d.d>s.min and d.d < s.min+0.1
+   group by zipcode,min order by zipcode,min;
+  #+end_src
+
+  #+RESULTS:
+  | zipcode | min | count |
+  |---------+-----+-------|
+  |   91710 |   0 |   427 |
+  |   91710 | 0.1 |   110 |
+  |   91710 | 0.2 |     8 |
+  |   91710 | 0.5 |     1 |
+  |   91710 | 0.9 |     1 |
+  |   93066 |   0 |   502 |
+  |   93066 | 0.1 |    38 |
+  |   93066 | 0.2 |     4 |
+  |   93066 | 0.3 |     1 |
+  |   93066 | 0.4 |     1 |
+  |   93066 | 0.8 |     1 |
+  |   93429 |   0 |   483 |
+  |   93429 | 0.1 |    56 |
+  |   93429 | 0.2 |     4 |
+  |   93429 | 0.3 |     1 |
+  |   93429 | 0.4 |     2 |
+  |   93429 | 0.8 |     1 |
+  |   93551 |   0 |   461 |
+  |   93551 | 0.1 |    79 |
+  |   93551 | 0.2 |     4 |
+  |   93551 | 0.3 |     1 |
+  |   93551 | 0.7 |     2 |
+  |   93623 |   0 |   531 |
+  |   93623 | 0.1 |    13 |
+  |   93623 | 0.2 |     2 |
+  |   93623 | 0.4 |     1 |
+  |   93624 |   0 |   497 |
+  |   93624 | 0.1 |    47 |
+  |   93624 | 0.2 |     1 |
+  |   93624 | 0.3 |     2 |
+  |   95595 |   0 |   535 |
+  |   95595 | 0.1 |     9 |
+  |   95595 | 0.3 |     1 |
+  |   95595 | 0.4 |     1 |
+  |   95595 | 0.6 |     1 |
+  |   95606 |   0 |   487 |
+  |   95606 | 0.1 |    59 |
+  |   95606 | 0.6 |     1 |
+  |   96031 |   0 |   539 |
+  |   96031 | 0.1 |     3 |
+  |   96031 | 0.2 |     4 |
+  |   96031 | 0.4 |     1 |
+
+
+
+** Bad Days
+
+If we look at the daily summaries for a single month in our zipcode record for
+one zipcode and each day for the month, we see something fishy.
+
+#+begin_src sql
+    select *from zip_et0
+   where zipcode='93551' and extract(month from ymd)=5
+   order by ymd,zipcode;
+#+end_src
+
+#+RESULTS:
+| zipcode |       eto |          k |       eto_rms |  eto_dish |     k_dish |        ymd | doy |
+|---------+-----------+------------+---------------+-----------+------------+------------+-----|
+|   93551 | 3.8809562 | 0.81327248 |  0.0048795049 | 3.8223975 | 0.78860891 | 2023-05-01 | 121 |
+|   93551 | 3.8381124 | 0.72644889 |  0.0024230736 | 3.8223896 | 0.71953261 | 2023-05-02 | 122 |
+|   93551 | 4.1301351 | 0.85307193 |   0.001449024 | 4.1039004 | 0.84171402 | 2023-05-03 | 123 |
+|   93551 | 2.9211197 |  0.6491127 |  0.0034409841 |  2.878933 | 0.63162035 | 2023-05-04 | 124 |
+|   93551 | 4.1569386 | 0.86660582 |  0.0022143815 | 4.1228433 | 0.85299355 | 2023-05-05 | 125 |
+|   93551 | 4.2103257 | 0.87405777 |  0.0010339358 | 4.1873608 | 0.86505407 | 2023-05-06 | 126 |
+|   93551 | 4.8369079 | 0.97814637 |  0.0010929073 | 4.8078938 | 0.96744245 | 2023-05-07 | 127 |
+|   93551 | 5.0581331 | 0.98101109 |  0.0013751163 | 5.0235038 | 0.96897954 | 2023-05-08 | 128 |
+|   93551 | 4.3614221 | 0.86457264 |  0.0029098317 | 4.3111935 | 0.84573013 | 2023-05-09 | 129 |
+|   93551 | 5.0264864 | 0.96478009 |  0.0025855771 | 4.9774227 | 0.94677752 | 2023-05-10 | 130 |
+|   93551 | 5.4414749 | 0.98653764 | 0.00070106977 |  5.416729 | 0.97925037 | 2023-05-11 | 131 |
+|   93551 | 5.8862624 | 0.98530591 |  0.0014272513 | 5.8509188 | 0.97493154 | 2023-05-12 | 132 |
+|   93551 | 6.4970469 | 0.98985422 |  0.0042264918 | 6.4335079 | 0.97126502 | 2023-05-13 | 133 |
+|   93551 | 6.8815298 | 0.98949236 |  0.0070492704 | 6.7993407 | 0.96489364 | 2023-05-14 | 134 |
+|   93551 | 6.3068037 | 0.91005862 |  0.0076403548 | 6.2270517 | 0.88667721 | 2023-05-15 | 135 |
+|   93551 | 6.3726096 | 0.92349958 |  0.0098550795 | 6.2759142 | 0.89582419 | 2023-05-16 | 136 |
+|   93551 | 6.7915082 | 0.98813128 |   0.011979366 | 6.6840706 | 0.95699155 | 2023-05-17 | 137 |
+|   93551 | 6.5350642 | 0.98642284 |   0.019644098 | 6.3967619 | 0.95373493 | 2023-05-18 | 138 |
+|   93551 | 6.4311061 | 0.98530871 |   0.011387222 | 6.3265882 | 0.95686156 | 2023-05-19 | 139 |
+|   93551 | 6.4863572 | 0.96131063 |   0.014042361 | 6.3742094 | 0.93213695 | 2023-05-20 | 140 |
+|   93551 | 6.0848331 | 0.87855387 |  0.0078310352 | 6.0002069 | 0.85741061 | 2023-05-21 | 141 |
+|   93551 |  6.439446 |  0.9845711 |   0.011414692 | 6.3345327 | 0.95672661 | 2023-05-22 | 142 |
+|   93551 | 5.8301482 | 0.98124456 |  0.0055529173 | 5.7572188 | 0.95905107 | 2023-05-23 | 143 |
+|   93551 | 5.5224609 |  0.9517023 |     5.6782966 | 3.1417553 | 0.89192015 | 2023-05-24 | 144 |
+|   93551 | 5.5145984 | 0.95364368 |  0.0056344881 | 5.4409809 | 0.92966074 | 2023-05-25 | 145 |
+|   93551 | 5.2525835 | 0.90395588 |  0.0044675143 | 5.1885366 | 0.88317966 | 2023-05-26 | 146 |
+|   93551 | 6.2166047 | 0.98373342 |  0.0079552932 | 6.1307111 | 0.95933098 | 2023-05-27 | 147 |
+|   93551 | 5.7642136 | 0.97637075 |  0.0028736263 | 5.7120981 | 0.96097773 | 2023-05-28 | 148 |
+|   93551 | 5.6090879 | 0.90730339 |  0.0028878634 | 5.5589285 | 0.89199644 | 2023-05-29 | 149 |
+|   93551 | 4.9157314 | 0.81332195 |  0.0046599288 | 4.8520546 | 0.79352057 | 2023-05-30 | 150 |
+|   93551 | 5.2493863 | 0.85263473 |  0.0065154308 | 5.1729541 | 0.82862461 | 2023-05-31 | 151 |
+|   93551 | 5.6462617 | 0.98610294 |  0.0020402374 | 5.6022019 | 0.96990788 | 2024-05-01 | 122 |
+|   93551 | 5.4849291 | 0.98586142 |  0.0028266062 | 5.4334383 | 0.96732926 | 2024-05-02 | 123 |
+|   93551 | 5.2113881 | 0.98795927 |  0.0019529117 |  5.168674 | 0.97376865 | 2024-05-03 | 124 |
+|   93551 | 3.6518309 | 0.70044565 |  0.0013099936 | 3.6181438 | 0.68688214 | 2024-05-04 | 125 |
+|   93551 | 4.4117498 | 0.97557068 | 0.00074710668 | 4.3880377 |  0.9641301 | 2024-05-05 | 126 |
+|   93551 | 5.3159103 | 0.99323034 | 0.00093401351 |  5.286727 | 0.98208439 | 2024-05-06 | 127 |
+|   93551 |  5.772131 | 0.99119997 |  0.0032901212 | 5.7168789 |  0.9700985 | 2024-05-07 | 128 |
+|   93551 | 5.3521051 | 0.98804134 |     6.1811075 | 2.8661938 | 0.98446971 | 2024-05-08 | 129 |
+|   93551 | 5.6032667 | 0.99086058 |  0.0031731569 | 5.5490146 |  0.9722479 | 2024-05-09 | 130 |
+|   93551 | 5.3897753 | 0.91027039 |  0.0024343082 | 5.3568983 | 0.89969218 | 2024-05-10 | 131 |
+|   93551 | 5.6446247 | 0.95310283 |  0.0046814969 | 5.5849628 | 0.93533987 | 2024-05-11 | 132 |
+|   93551 | 6.2112575 | 0.98495191 |  0.0045481487 | 6.1460967 | 0.96528894 | 2024-05-12 | 133 |
+|   93551 | 6.2035327 | 0.97058094 |  0.0049771313 | 6.1345787 | 0.94931573 | 2024-05-13 | 134 |
+|   93551 | 6.1131082 | 0.98170578 | 0.00090075302 | 6.0852232 |  0.9734872 | 2024-05-14 | 135 |
+|   93551 | 6.0074244 | 0.94538641 |  0.0027046031 | 5.9762053 | 0.93627912 | 2024-05-15 | 136 |
+|   93551 | 6.2223492 | 0.98050565 |  0.0071873236 | 6.1405134 | 0.95671648 | 2024-05-16 | 137 |
+|   93551 | 5.9250493 |  0.9667334 |  0.0015084395 | 5.8882594 | 0.95529449 | 2024-05-17 | 138 |
+|   93551 | 6.1100159 |  0.9817937 |  0.0033639036 | 6.0536103 | 0.96859866 | 2024-05-18 | 139 |
+|   93551 | 6.0066953 | 0.97473407 |  0.0031310322 | 5.9534016 | 0.95744807 | 2024-05-19 | 140 |
+|   93551 | 4.9204078 | 0.84533662 | 0.00032860928 | 4.9100318 | 0.84183991 | 2024-05-20 | 141 |
+|   93551 | 5.7772574 | 0.97687137 |  0.0032398095 | 5.7237444 | 0.96086729 | 2024-05-21 | 142 |
+|   93551 | 5.8314676 | 0.97818244 |  0.0024429043 | 5.7846584 | 0.96364272 | 2024-05-22 | 143 |
+|   93551 | 5.6689606 | 0.96608341 |     5.7627587 | 3.2695949 | 0.95432782 | 2024-05-23 | 144 |
+|   93551 | 4.4628668 |  0.7970379 |  0.0033924475 | 4.4096289 | 0.77839798 | 2024-05-24 | 145 |
+|   93551 | 5.2770424 | 0.97827584 |  0.0015988635 | 5.2400517 | 0.96560717 | 2024-05-25 | 146 |
+|   93551 | 5.5730247 | 0.98450959 |  0.0065162079 | 5.4957595 |  0.9618293 | 2024-05-26 | 147 |
+|   93551 | 5.9460573 | 0.99033642 |  0.0087477155 | 5.8555269 | 0.96415401 | 2024-05-27 | 148 |
+|   93551 | 6.2351441 | 0.98857683 |  0.0053856303 | 6.1641092 |  0.9680745 | 2024-05-28 | 149 |
+|   93551 | 6.6232147 |  0.9914465 |  0.0023090611 | 6.5774684 | 0.97827578 | 2024-05-29 | 150 |
+|   93551 |  6.529779 |  0.9895013 |   0.004447707 |  6.465764 | 0.97184259 | 2024-05-30 | 151 |
+|   93551 | 6.7621059 | 0.99114424 |  0.0094793485 |  6.667676 | 0.96523923 | 2024-05-31 | 152 |
+
+These high monthly values for May, seem to really be coming from the fact that
+there are three seemingly completely bad days in the dish record.  
+
+If we just look at days with very high differences in many zipcodes, those are
+probably bads days in the current system.
+
+#+begin_src sql
+  with gt1 as (select * from zip_et0 where (eto-eto_dish)^2 > 1 order by ymd,zipcode
+) select ymd,count(*) from gt1 group by ymd order by ymd;
+#+end_src
+
+#+RESULTS:
+|        ymd | count |
+|------------+-------|
+| 2023-05-24 |  1812 |
+| 2024-01-15 |    80 |
+| 2024-03-14 |  1777 |
+| 2024-05-08 |  1812 |
+| 2024-05-23 |  1812 |
+| 2024-07-21 |  1812 |
+| 2024-09-15 |  1785 |
+| 2024-10-03 |     6 |
+| 2024-10-04 |  1744 |
+| 2024-10-05 |    23 |
+
+** UCD vs DWR
+
+A confounding problem with the above processing is that these particular error
+days don't always match what we see on DWR's site.  For example, if we download
+the data from the CIMIS spatial exports, their ETo values sometimes match the
+GOES-18 download and sometimes the UCD site.
+
+Unfortunately, one bad day can also potentially negatively affect the next 14
+days, if the cloud cover is wrong. 
+
+#+begin_src bash
+  c=https://spatialcimis.water.ca.gov/cimis
+  for ymd in 20230524 20240314 20240508 20240523 20240721 20240915 20241004; do
+      y=${ymd:0:4}; m=${ymd:4:2}; d=${ymd:6:2}
+      g.mapset $ymd 2> /dev/null
+      for l in ETo K Rs ; do   
+  	http $c/$y/$m/$d/${l}.asc.gz | gzip -d > ${l}.asc;
+  	r.in.gdal --overwrite -o input=${l}.asc output=${l}_dwr 2> /dev/null
+      done
+      g.mapset quinn 2> /dev/null
+  done
+#+end_src
+
+#+begin_src bash
+  for ymd in 20230524 20240314 20240508 20240523 20240721 20240915 do
+      for l in ETo K Rs ; do   
+  	for r in ${l} ${l}_dish ${l}_dwr; do
+  	    eval $(r.info -r $r@$ymd); echo "# $ymd $r $min $max";
+  	done
+      done
+  done
+# 20230524 ETo 2.09008514324924 11.3363533059322
+# 20230524 ETo_dish 0.755994401462333 8.67497657192258
+# 20230524 ETo_dwr 2.12658 11.24617
+# 20230524 K 0.401954727069373 0.999915864437246
+# 20230524 K_dish -0.180444659865361 1.79248010266776
+# 20230524 K_dwr 0.3983524 0.9925639
+# 20230524 Rs 12.0112768724467 33.4993842957403
+# 20230524 Rs_dish -2.74374825866495 27.7610692822108
+# 20230524 Rs_dwr 11.91079 33.05131
+# 20240314 ETo 1.32574969984573 7.33703057697445
+# 20240314 ETo_dish 0.782239593711356 6.23943645890956
+# 20240314 ETo_dwr 0.7940118 6.162756
+# 20240314 K 0.382669230485543 0.999955330177886
+# 20240314 K_dish 0.458815506840899 1.94516772867155
+# 20240314 K_dwr 0.5639567 1.943697
+# 20240314 Rs 8.05634218549986 24.1052481487406
+# 20240314 Rs_dish 5.21844624089157 23.0982438997208
+# 20240314 Rs_dwr 6.713366 23.09362
+# 20240508 ETo 1.79355961698321 13.0319229929861
+# 20240508 ETo_dish 0.0937586989465108 10.7868401666565
+# 20240508 ETo_dwr 1.815531 12.9741
+# 20240508 K 0.331796080248463 0.999912900576553
+# 20240508 K_dish -0.387600376720767 1.44921935829309
+# 20240508 K_dwr 0.2544318 0.9984136
+# 20240508 Rs 10.1913452585871 32.3316334516222
+# 20240508 Rs_dish -5.88885571493885 20.9260537684518
+# 20240508 Rs_dwr 7.47935 32.16756
+# 20240523 ETo 1.73297006887671 10.5466990140609
+# 20240523 ETo_dish 0.407410585861055 7.39651773067673
+# 20240523 ETo_dwr 1.694021 10.51109
+# 20240523 K 0.300835219705152 0.999920494069264
+# 20240523 K_dish -0.415230875002078 1.91595948912315
+# 20240523 K_dwr 0.2654709 0.9984364
+# 20240523 Rs 9.02314102205672 33.5655227678369
+# 20240523 Rs_dish -6.27255726045309 28.7463835851158
+# 20240523 Rs_dwr 7.880437 33.34787
+# 20240721 ETo -1.80708585912898 11.7157413145024
+# 20240721 ETo_dish -3.14938747339942 8.41716228731875
+# 20240721 ETo_dwr -2.947027 8.348779
+# 20240721 K 0.429381402350344 0.999910659907123
+# 20240721 K_dish -0.0174308790996267 1.70483369775576
+# 20240721 K_dwr 0.01974249 1.658298
+# 20240721 Rs 12.5141129060205 33.3602983620505
+# 20240721 Rs_dish -0.272347957842205 27.0154391232463
+# 20240721 Rs_dwr 0.3091677 26.89044
+# 20240915 ETo 1.66259555798696 10.5139116051164
+# 20240915 ETo_dish 0.661815921268731 8.25443526116492
+# 20240915 ETo_dwr 1.767006 10.46072
+# 20240915 K 0.434937610593347 0.999961777139662
+# 20240915 K_dish -0.0175153822229748 1.91759624232726
+# 20240915 K_dwr 0.4368927 0.9871688
+# 20240915 Rs 10.0601383075737 26.5943906472868
+# 20240915 Rs_dish -0.199838773200059 25.2038643351909
+# 20240915 Rs_dwr 9.782039 26.00994
+#+end_src
