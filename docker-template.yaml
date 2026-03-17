@@ -1,0 +1,26 @@
+services:
+  goes18:
+    image: &BASE ${D[org]}/goes18:${D[tag]}
+    volumes:
+      - &GRASSDB ${GRASSDB:-grassdb}:/grassdb
+      - &SERVICE_ACCOUNT ${GCLOUD_SERVICE_ACCOUNT_MOUNT:-./service-account.json}:/etc/service-account.json
+    environment:
+      - TAG=${D[tag]}
+      - DATE=2023-01-01
+      - LOCATION=cimis
+      - MAPSET=2023-01-01
+    restart: unless-stopped
+    logging: &LOGGING
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "2"
+    command: goes18-eto
+    # command: bash -c 'tail -f /dev/null'
+
+###
+# Docker data volumes
+###
+volumes:
+  grassdb:
+    driver: local
