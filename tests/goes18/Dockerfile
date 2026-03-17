@@ -1,8 +1,9 @@
-ARG GRASS_TAG=releasebranch_8_4-debian
+#ARG GRASS_TAG=releasebranch_8_4-debian
+ARG GRASS_TAG=8.4.2-debian
 
 #FROM gcr.io/google.com/cloudsdktool/google-cloud-cli:stable as gustil
 
-FROM osgeo/grass-gis:${GRASS_TAG} as grass
+FROM osgeo/grass-gis:${GRASS_TAG} AS grass
 ARG R_IHELIOSAT_VERSION=1.2.0
 ARG G_CIMIS_DAILY_SOLAR_VERSION=2.0.2
 ARG ARC=https://github.com/qjhart
