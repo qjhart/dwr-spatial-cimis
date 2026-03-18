@@ -1,0 +1,282 @@
+# 405 categories
+Rasterized vector map from labels
+
+0.00 0.00 0.00 0.00
+0:Island
+1:Lost River
+2:Butte Valley
+3:Scott Valley
+4:Shasta Valley
+7:Trinity
+10:Lower Klamath
+14:Smith River Basin
+17:Big-Noyo-Ten Mile
+18:Navarro-Garcia
+19:Gualala
+20:Lower Eel
+21:Van Duzen
+23:South Fork Eel
+25:Upper Eel
+27:Mattole-Bear
+28:Redwood Creek
+30:Mad-Trinidad
+32:Eureka Plain
+35:Lower Russian
+36:Santa Rosa
+37:Bodega
+38:West Marin
+40:Napa
+41:Solano
+42:San Mateo Coast
+43:South Bay Peninsula
+44:San Jose
+45:Livermore
+46:Walnut Creek
+47:Oakland
+48:Pressure
+49:East Side
+50:Forebay
+51:Upper Valley
+52:Monterey Peninsula
+53:Arroyo Seco - Northern
+54:Gabilan Range
+55:Lockwood
+56:Carmel River
+57:Santa Lucia Range
+58:Bolsa Nueva
+59:Watsonville
+60:Santa Cruz
+61:Santa Cruz Mountains
+62:South Santa Clara Valley
+63:Pacheco-Santa Ana Creeks
+64:San Benito River
+65:Upper Salinas
+66:North Coast
+67:San Luis Obispo
+68:Arroyo Grande
+69:Carrizo Plain
+70:Santa Maria Valley-SLO
+71:Santa Maria Valley-SB
+72:Cuyama Valley-SLO
+73:San Antonio
+74:Santa Ynez
+75:South Coast
+76:Cuyama Valley-SB
+81:Ventura County
+83:Los Angeles County
+87:Malibu
+89:Coastal
+90:San Fernando
+92:San Gabriel
+96:Orange
+98:Riverside North
+100:San Bernardino
+104:Riverside South
+110:Temecula
+114:Viego
+120:San Diego County
+130:Goose Lake-Alturas
+132:Big Valley
+134:MacArthur-Hat Creek
+136:Upper Shasta Lake
+137:Clear-Cottonwood Creek
+139:Stony-Elder Creek Group
+141:Redding West
+142:Red Bluff-Orland
+143:Redding East
+144:Los Molinos
+145:Cow-Battle Creek
+147:Eastside Creek Group
+154:Feather River
+156:Yuba-Bear Rivers
+158:American River
+159:Honcut Foothill
+160:Yuba Foothill
+161:Placer Foothill
+162:Lower Cache Creek
+163:Willows-Arbuckle
+164:Glenn-Knights Landing
+165:Meridian-Robbins
+166:Durham-Sutter
+167:Butte City
+168:Yuba City-Gridley
+170:Honcut Valley
+171:172:Yuba
+173:Sacramento
+174:Cache Creek
+175:Putah Creek
+176:Consumnes-Mokelumne-Calaveras
+180:Elk Grove
+181:Ione-Jenny Lind
+182:Lodi
+184:Bachelor Valley
+185:San Joaquin Delta
+186:Sacramento Delta
+191:Vacaville
+192:Antioch-Corral Hollow
+194:Stanislaus River
+195:Tuolumne River
+196:Stanislaus-Tuolumne Interstrea
+197:Merced River
+198:Tuolumne-Merced Interstream
+199:Chowchilla-Fresno Interstream
+200:Fresno River
+201:Chowchilla  River
+202:Mariposa
+203:San Joaquin  River
+204:Little Dry Creek
+205:South San Joaquin ID
+206:Modesto-Oakdale
+207:Modesto Reservoir
+208:Turlock
+209:Turlock Lake
+210:Merced
+211:Merced Stream Group
+212:El Nido-Stevinson
+213:Madera-Chowchilla
+214:Adobe - Valley Eastside
+215:Gravelly Ford
+216:West Side
+217:Del Puerto Creek
+218:Orestimba Creek
+219:San Luis Creek
+220:Los Banos Creek
+221:San Joaquin-Kings Interstream
+222:Kings River
+223:Kings-Kaweah Interstream
+224:Kaweah River
+225:Kaweah-Tule Interstream
+226:Tule River
+227:Deer Creek
+228:Poso Creek
+229:Upper Kern River
+230:Lower Kern River
+231:Caliente Creek
+232:Cummings
+233:Fresno
+234:Academy
+235:Raisin
+236:Consolidated
+237:Lower Kings River
+238:Hanford-Lemoore
+239:Alta
+240:Orange Cove
+241:Tulare Lake
+242:Kaweah Delta
+243:Tule Delta
+244:Westlands
+245:Kettleman Plain
+246:South Tulare Lake
+247:Kettleman Hills
+248:Panoche Creek
+249:Ciervo Hills
+250:Los Gatos Creek
+251:Reef Ridge
+252:Grapevine
+253:Temblor
+254:Kern Delta
+255:Semitropic
+256:North Kern
+257:Northeastern Kern
+258:Arvin-Edison
+259:Antelope Plain
+260:Buena Vista Valley
+261:Wheeler Ridge-Maricopa
+262:Surprise Valley
+263:Madeline Plains
+264:Susanville
+265:Herlong
+266:Upper Honey Lake
+268:Truckee-Tahoe
+270:Carson-Walker
+274:Mono
+275:Adobe - Mono-Owens area
+276:Long
+277:Upper Owens
+278:Lower Owens
+279:Centennial
+280:Fish Lake
+281:Deep Springs
+282:Eureka
+283:Saline
+284:Race Track
+285:Death Valley
+286:Valjean
+287:Furnace Creek
+288:Amargosa
+289:Pahrump
+290:Mesquite
+291:Ivanpah
+292:Owlshead
+293:Leach
+294:Nelson
+295:Bicycle
+296:Goldstone
+297:Superior
+298:Panamint
+299:Searles
+300:Cuddeback
+301:Coso
+302:Upper Cactus
+303:Indian Wells
+304:Fremont
+305:Mojave
+306:Rosamond-Palmdale
+307:Pearblossom
+308:El Mirage
+309:Upper Mojave
+310:Middle Mojave
+311:Harper
+312:Lower Mojave
+313:Afton
+314:Troy
+315:Coyote - Death Valley
+316:Baker
+317:Kelso
+318:Broadwell
+319:Lucerne
+320:Johnson
+321:Bessemer
+322:Means
+323:Emerson
+324:Lavic
+325:Deadman
+326:Joshua Tree
+327:Dale
+328:Bristol
+329:Fenner
+330:Lanfair
+331:Cadiz
+332:Ward
+333:Rice
+334:Ford
+335:Palen
+336:Pinto
+337:Pleasant
+338:Hayfield
+339:Piute
+340:Needles
+341:Chemehuevis
+342:Quien Sabe
+343:Vidal
+344:Big Wash
+345:Palo Verde
+346:Arroyo Seco - Colorado River
+347:Yuma
+348:Coachella
+349:East Salton Sea
+350:Clark
+351:West Salton Sea
+352:Anza
+353:Imperial
+354:Coyote Wells
+355:Davies
+356:Amos-Agilby
+357:Salton Sea
+391:South Sonoma
+392:East Marin
+401:Forsythe
+402:Coyote - Russian River
+403:Upper Russian
+404:Middle Russian
+405:Dry Creek
