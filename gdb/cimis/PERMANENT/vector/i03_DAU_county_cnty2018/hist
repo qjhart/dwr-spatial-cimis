@@ -1,0 +1,24 @@
+COMMAND: v.in.ogr --overwrite input="/tmp/grass8-quinn-82030/tmp.JiWYqblzNO/i03_DAU_county_cnty2018.shp" output="i03_DAU_county_cnty2018" min_area=0.0001 type="" snap=-1
+GISDBASE: /home/quinn/dwr-spatial-cimis/gdb
+LOCATION: tmp_v_import_location_hart_mini_82127 MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 14:29:32 2026
+-----------------------------------------------------
+1128 input polygons
+Total area: 6.51473E+11 (1153 areas)
+Overlapping area: 298.515 (22 areas)
+Area without category: 4050.07 (9 areas)
+---------------------------------------------------------------------------------
+COMMAND: v.proj --overwrite project="tmp_v_import_location_hart_mini_82127" mapset="PERMANENT" input="i03_DAU_county_cnty2018" smax=10000
+GISDBASE: /home/quinn/dwr-spatial-cimis/gdb
+LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 14:29:35 2026
+---------------------------------------------------------------------------------
+COMMAND: v.db.update map=i03_DAU_county_cnty2018 column=DAU_NAME 'value=West Marin' 'where=DAU_CODE="038"'
+GISDBASE: /home/quinn/dwr-spatial-cimis/gdb
+LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 14:29:36 2026
+---------------------------------------------------------------------------------
+COMMAND: v.db.addcolumn map=i03_DAU_county_cnty2018 'column=dau integer'
+GISDBASE: /home/quinn/dwr-spatial-cimis/gdb
+LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 14:29:36 2026
+---------------------------------------------------------------------------------
+COMMAND: v.db.update map=i03_DAU_county_cnty2018 column=dau 'qcol=CAST(DAU_CODE AS integer)'
+GISDBASE: /home/quinn/dwr-spatial-cimis/gdb
+LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 14:29:36 2026

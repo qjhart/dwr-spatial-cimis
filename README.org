@@ -1,0 +1,5 @@
+* DWR Spatial CIMIS
+
+This project started as a location to do some comparison tests with but is
+moving to a more complete description of a working framework for DWR's spatial
+cimis program.
