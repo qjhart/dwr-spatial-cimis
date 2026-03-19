@@ -1,24 +1,28 @@
-COMMAND: v.in.ogr --overwrite input="/tmp/grass8-quinn-82030/tmp.JiWYqblzNO/i03_DAU_county_cnty2018.shp" output="i03_DAU_county_cnty2018" min_area=0.0001 type="" snap=-1
+COMMAND: v.in.ogr --overwrite input="/tmp/grass8-quinn-92947/tmp.3KQqPidTKq/i03_DAU_county_cnty2018.shp" output="i03_DAU_county_cnty2018" min_area=0.0001 type="" snap=1
 GISDBASE: /home/quinn/dwr-spatial-cimis/gdb
-LOCATION: tmp_v_import_location_hart_mini_82127 MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 14:29:32 2026
+LOCATION: tmp_v_import_location_hart_mini_99691 MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 19:13:49 2026
 -----------------------------------------------------
 1128 input polygons
-Total area: 6.51473E+11 (1153 areas)
-Overlapping area: 298.515 (22 areas)
-Area without category: 4050.07 (9 areas)
+Total area: 6.51473E+11 (1126 areas)
+Overlapping area: 0 (0 areas)
+Area without category: 4016.94 (2 areas)
 ---------------------------------------------------------------------------------
-COMMAND: v.proj --overwrite project="tmp_v_import_location_hart_mini_82127" mapset="PERMANENT" input="i03_DAU_county_cnty2018" smax=10000
+COMMAND: v.proj --overwrite project="tmp_v_import_location_hart_mini_99691" mapset="PERMANENT" input="i03_DAU_county_cnty2018" smax=10000
 GISDBASE: /home/quinn/dwr-spatial-cimis/gdb
-LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 14:29:35 2026
+LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 19:13:56 2026
+---------------------------------------------------------------------------------
+COMMAND: v.edit map="i03_DAU_county_cnty2018" layer="1" type="point,line,boundary,centroid" tool="delete" threshold=-1,0,0 where="TYPE='Water'" snap="no"
+GISDBASE: /home/quinn/dwr-spatial-cimis/gdb
+LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 19:13:57 2026
 ---------------------------------------------------------------------------------
 COMMAND: v.db.update map=i03_DAU_county_cnty2018 column=DAU_NAME 'value=West Marin' 'where=DAU_CODE="038"'
 GISDBASE: /home/quinn/dwr-spatial-cimis/gdb
-LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 14:29:36 2026
+LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 19:13:57 2026
 ---------------------------------------------------------------------------------
 COMMAND: v.db.addcolumn map=i03_DAU_county_cnty2018 'column=dau integer'
 GISDBASE: /home/quinn/dwr-spatial-cimis/gdb
-LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 14:29:36 2026
+LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 19:13:57 2026
 ---------------------------------------------------------------------------------
 COMMAND: v.db.update map=i03_DAU_county_cnty2018 column=dau 'qcol=CAST(DAU_CODE AS integer)'
 GISDBASE: /home/quinn/dwr-spatial-cimis/gdb
-LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 14:29:36 2026
+LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 19:13:58 2026
