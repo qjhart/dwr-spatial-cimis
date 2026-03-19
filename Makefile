@@ -17,22 +17,28 @@ in_grass:  ## Check if we are in a GRASS GIS session
     exit 1; \
 	fi
 
-dau:${GISDBASE}/cimis/500m/cellhd/dau ## Generate the dau@500m raster layer.
+dau:${GISDBASE}/cimis/PERMANENT/vector/dau ${GISDBASE}/cimis/500m/cellhd/dau ## Generate the dau@500m raster layer.
 
 dau_vector: ${dau_vector} ## Generate the DAU vector layer i03_DUA_county_cnty2018@PERMANENT
-${dau_vector}:${GISDBASE}/cimis/PERMANENT/vector/${dau_vector}
 
+${dau_vector}:${GISDBASE}/cimis/PERMANENT/vector/${dau_vector} in_grass
+
+# I have to add a snap, because the shapfile has some overlapping polygons.
 ${GISDBASE}/cimis/PERMANENT/vector/${dau_vector}:in_grass
 	d=$$(mktemp -d); echo $$d; \
 	curl --follow 'https://gis.data.cnra.ca.gov/api/download/v1/items/27dbe3d6fb4e4bd5921e27313e406397/shapefile?layers=0' --output=$$d/${dau_vector}.zip; \
 	unzip -o $$d/${dau_vector}.zip -d $$d; \
 	g.mapset mapset=PERMANENT; \
-	v.import input=$$d/${dau_vector}.shp output=${dau_vector} --overwrite; \
+	v.import input=$$d/${dau_vector}.shp output=${dau_vector} snap=1 --overwrite; \
+	v.edit map=${dau_vector} tool=delete where="TYPE='Water'"; \
 	v.db.update map=${dau_vector} column=DAU_NAME value="West Marin" where='DAU_CODE="038"'; \
 	v.db.addcolumn map=${dau_vector} column="dau integer"; \
 	v.db.update map=${dau_vector} column=dau qcol="CAST(DAU_CODE AS integer)"; \
 	g.mapset mapset=${MAPSET}; \
 	rm -rf $$d
+
+${GISDBASE}/cimis/PERMANENT/vector/dau:in_grass ${GISDBASE}/cimis/PERMANENT/vector/${dau_vector}
+	v.dissolve input=${dau_vector} layer=1 output=dau column=DAU_CODE --overwrite
 
 ${GISDBASE}/cimis/500m/cellhd/dau: in_grass ${GISDBASE}/cimis/PERMANENT/vector/${dau_vector}
 	g.mapset mapset=500m; \
