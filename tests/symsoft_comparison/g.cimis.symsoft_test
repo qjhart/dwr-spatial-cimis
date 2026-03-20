@@ -135,6 +135,7 @@ G_verify_mapset
 stats_make
 g.message -v message="Calculating [Tn|Tx|Tdew|U2|Rs|K|Rnl|ETo]_[d|q]_diff ${GBL[MAPSET]}"
 for m in ${GBL[interpolate]} ${GBL[solar]} ${GBL[calc]}; do
+  diff $m
   stats_add $m
 done
 
