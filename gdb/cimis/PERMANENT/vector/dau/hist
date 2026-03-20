@@ -27,14 +27,22 @@ COMMAND: v.db.update map=i03_DAU_county_cnty2018 column=dau 'qcol=CAST(DAU_CODE 
 GISDBASE: /home/quinn/dwr-spatial-cimis/gdb
 LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 19:13:58 2026
 ---------------------------------------------------------------------------------
-COMMAND: v.reclass input="i03_DAU_county_cnty2018" layer="1" type="point,line,boundary,centroid" output="dau_hart_mini_99762" column="DAU_CODE"
+COMMAND: v.reclass input="i03_DAU_county_cnty2018" layer="1" type="point,line,boundary,centroid" output="dau_hart_mini_212415" column="DAU_CODE"
 GISDBASE: /home/quinn/dwr-spatial-cimis/gdb
-LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 19:13:58 2026
+LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Fri Mar 20 10:39:27 2026
 ---------------------------------------------------------------------------------
-COMMAND: v.extract -d input="dau_hart_mini_99762" layer="1" type="point,line,boundary,centroid,area,face" output="dau" new=-1
+COMMAND: v.extract -d input="dau_hart_mini_212415" layer="1" type="point,line,boundary,centroid,area,face" output="dau" new=-1
 GISDBASE: /home/quinn/dwr-spatial-cimis/gdb
-LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 19:13:58 2026
+LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Fri Mar 20 10:39:27 2026
 ---------------------------------------------------------------------------------
 COMMAND: v.dissolve input=i03_DAU_county_cnty2018 layer=1 output=dau column=DAU_CODE --overwrite
 GISDBASE: /home/quinn/dwr-spatial-cimis/gdb
-LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Wed Mar 18 19:13:58 2026
+LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Fri Mar 20 10:39:27 2026
+---------------------------------------------------------------------------------
+COMMAND: v.edit map="dau" layer="1" type="point,line,boundary,centroid" tool="delete" threshold=-1,0,0 where="DAU_CODE=''" snap="no"
+GISDBASE: /home/quinn/dwr-spatial-cimis/gdb
+LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Fri Mar 20 10:39:27 2026
+---------------------------------------------------------------------------------
+COMMAND: v.to.db --overwrite map="dau" layer="1" type="point,line,boundary,centroid" option="area" columns="hectares" units="kilometers" query_layer="1" separator="pipe"
+GISDBASE: /home/quinn/dwr-spatial-cimis/gdb
+LOCATION: cimis MAPSET: PERMANENT USER: quinn DATE: Fri Mar 20 10:39:27 2026
