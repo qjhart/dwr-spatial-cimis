@@ -48,23 +48,31 @@ function diff() {
 }
 
 function stats_make() {
+  local s=$1 # d or q (dish or quinn)
+  local stats=stats_${s}
   local date="${GBL[YYYY]}-${GBL[MM]}-${GBL[DD]}"
   local doy=$(date -d "${date}" +%j)
-  g.copy vect=dau@PERMANENT,stats --overwrite
-  v.db.addcolumn map=stats columns='date date,doy integer'
-  v.db.update map=stats column=date value="${date}"
-  v.db.update map=stats column=doy value="${doy}"
+  g.copy vect=dau@PERMANENT,$stats --overwrite
+  v.db.addcolumn map=$stats columns='date date,doy integer'
+  v.db.update map=$stats column=date value="${date}"
+  v.db.update map=$stats column=doy value="${doy}"
 }
 
 
 function stats_add() {
-  local m=$1
-  local d=${GBL[YYYYMMDD]}_d
-  local n=${GBL[YYYYMMDD]}
+  local s=$1
+  local stats=stats_${s}
+  local var=$2
+  local ref
+  if [[ $s == "d" ]]; then
+    ref=${GBL[YYYYMMDD]}_d
+  elif [[ $s == "q" ]]; then
+    ref=${GBL[YYYYMMDD]}
+  fi
   # First Add in reference stats
-  v.rast.stats -c map=stats raster=${m}@$d column_prefix=$m method=average,stddev -c
+  v.rast.stats -c map=$stats raster=${m}@$ref column_prefix=$m method=average,stddev -c
   # Then add in change
-  v.rast.stats -c map=stats raster=${m}_d_diff column_prefix=${m}_d_diff method=average,stddev
+  v.rast.stats -c map=$stats raster=${m}_d_diff column_prefix=d${m} method=average,stddev
 }
 
 
@@ -132,12 +140,13 @@ fi
 
 G_verify_mapset
 
-stats_make
-g.message -v message="Calculating [Tn|Tx|Tdew|U2|Rs|K|Rnl|ETo]_[d|q]_diff ${GBL[MAPSET]}"
-for m in ${GBL[interpolate]} ${GBL[solar]} ${GBL[calc]}; do
-  diff $m
-  stats_add $m
-done
+for ref in 'd'; do
+  stats_make $ref
+  g.message -v message="Stats w.r.t ($ref) [Tn|Tx|Tdew|U2|Rs|K|Rnl|ETo]@${GBL[MAPSET]}"
+  for m in ${GBL[interpolate]} ${GBL[solar]} ${GBL[calc]}; do
+    diff $ref $m
+    stats_add $ref$m
+  done
 
 # Calculate new BVEto
 if [[ ${GBL[mapset]} =~ 01$ ]] ; then
