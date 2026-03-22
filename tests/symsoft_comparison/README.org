@@ -1,0 +1,4 @@
+* Symsoft Testing
+
+This is similar to what we did for the goes18 tests, but we need to have an even
+more complex naming scheme.
