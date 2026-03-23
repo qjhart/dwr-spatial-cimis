@@ -39,7 +39,7 @@ function G_verify_mapset() {
 
 function diff() {
   local s=$1
-  local var=$1
+  local var=$2
   if [[ $s != "" ]]; then
     s='_'$s
   fi
