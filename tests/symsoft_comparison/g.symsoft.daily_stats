@@ -122,6 +122,6 @@ for ref in 'd'; do
   g.message -v message="Stats w.r.t ($ref) [Tn|Tx|Tdew|U2|Rs|K|Rnl|ETo]@${GBL[MAPSET]}"
   for m in ${GBL[interpolate]} ${GBL[solar]} ${GBL[calc]}; do
     diff $ref $m
-    stats_add $ref$m
+    stats_add $ref $m
   done
 done
