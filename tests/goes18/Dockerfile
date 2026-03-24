@@ -10,7 +10,7 @@ ARG ARC=https://github.com/qjhart
 
 RUN apt update && apt install -y \
     vim apt-transport-https ca-certificates \
-    lsb-release git gnupg curl python3
+    lsb-release git gnupg curl python3 awscli
 
 RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
