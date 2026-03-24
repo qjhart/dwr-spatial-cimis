@@ -5,12 +5,12 @@ ARG GRASS_TAG=8.4.2-debian
 
 FROM osgeo/grass-gis:${GRASS_TAG} AS grass
 ARG R_IHELIOSAT_VERSION=1.2.0
-ARG G_CIMIS_DAILY_SOLAR_VERSION=2.0.3
+ARG G_CIMIS_DAILY_SOLAR_VERSION=2.0.2
 ARG ARC=https://github.com/qjhart
 
 RUN apt update && apt install -y \
     vim apt-transport-https ca-certificates \
-    lsb-release git gnupg curl python3 awscli
+    lsb-release git gnupg curl python3
 
 RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
