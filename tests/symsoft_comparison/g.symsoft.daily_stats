@@ -51,8 +51,8 @@ function diff() {
     s='_'$s
   fi
   local ref=${GBL[YYYYMMDD]}${s}
-  g.message -v message="r.mapcalc ${GBL[overwrite]} --quiet expression=\"d${var}${s}=${var}-'${var}@$ref'\"";
-  r.mapcalc ${GBL[overwrite]} --quiet expression="d${var}${s}=${var}-'${var}@$ref'";
+  g.message -v message="r.mapcalc --overwrite --quiet expression=\"d${var}${s}=${var}-'${var}@$ref'\"";
+  r.mapcalc --overwrite --quiet expression="d${var}${s}=${var}-'${var}@$ref'";
 }
 
 function stats_make() {
@@ -115,13 +115,6 @@ GBL[interpolate]="Tn Tx Tdew U2"
 GBL[solar]="Rs K"
 GBL[calc]="Rnl ETo"
 GBL[ref]="d"
-
-# Get Options
-if [ $GIS_FLAG_F -eq 1 ] ; then
-  GBL[overwrite]='--overwrite'
-else
-  GBL[overwrite]=''
-fi
 
 
 if [ -n "$GIS_OPT_REF" ] ; then
