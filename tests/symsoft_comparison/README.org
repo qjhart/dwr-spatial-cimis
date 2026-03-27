@@ -1,4 +1,90 @@
 * Symsoft Testing
 
-This is similar to what we did for the goes18 tests, but we need to have an even
-more complex naming scheme.
+* Testing methodology
+
+These tests compare symsoft data for 2024, as provided via a set of exported
+images, labeled below as *symsoft* or *s*, including all the parameters going
+into the ETo calculation.  We compared these data to the DWR CIMIS.2 production
+data, labeled below as *dish*, or *d*, because it's based on radiation from a
+physical dish at DWR.  The actual data for the *dish* set was actually pulled
+from the UC Davis repository.  There can be some differences between the two, if
+their dish reception was different, but in general this is a copy of the DWR
+data.  We did this for two reasons; 1) We had access the actual machine, so we
+could easily sync the data over and 2) The public raster downloads available for
+DWR's data are not accurately projected, and cannot be used.  Finally, a third
+set of data *q* was created specifically for this testing.  These data were
+independant calculations of the radiation parameters.  This is required, because
+identifing differences between elevation parameters between *s* and *d* is not
+enough to determine if the *s* data is actually accurate.
+
+Using the above datasets, difference rasters were created for each variable.
+These can be used to visualize where differences exist between the datasets.  In
+addition, we further summarized the data by aggregating each variable, and the
+differences between the datasets, based on DAU regions. DAU regions are good
+because they are compact and based on underlying topographical data.  Many of
+the tables below show summaries based on these regions.
+
+[[file:figures/daus.png]]
+
+** Constants
+
+There are a few constant raster datasets that are used in calculations;
+elevation (~Z~), the CA State boundary (~state~), and the psychrometric_constant
+(~gamma~) are all the same between the three methods.
+
+*** Zipcodes
+
+The zipcode raster is used to aggregate the raster layers over areas for
+summarization, and honestly to provide a more convenient interface for API
+calls. Zipcodes are complicated by the fact that they are *not* a coverage for
+the State.  Large portions of the state are not covered by any zipcode.  In most
+cases this is probably okay, but it is strange.  CIMIS.2 uses a zipcode coverage
+from the 2012 census.  Symsoft say they were told to use the 2012 version.
+Zipcodes have changed so much however, I'd suggest that's not the right choice,
+there seems to be no reason to try and maintain consistancy accross time with a
+dataset that itself changes over time.
+
+| Zipcodes 2012                 | Zipcodes 2019                 |
+|-------------------------------+-------------------------------|
+| [[file:figures/zipcodes2012.png]] | [[file:figures/zipcodes2019.png]] |
+|-------------------------------+-------------------------------|
+
+** Radiation Parameters
+
+Rso, Rs, and K are the three parameters that are derived from the GOES satellite
+data.  Symsoft's radiation methodology uses data pulled from public cloud
+archives, where the CIMIS.2 uses data directly retreived from a dish.  Because
+of various problems with the dish, there can be differences in these to methods,
+these differences can be quite large.  The table below shows the number of days
+where a particular DAU is more than 10% different between the *dish* and
+*symsoft*. Most/All of these are because of dish issues.
+
+#+CALL: figures/README.org:delta_dish_10()
+#+RESULTS:
+|       date | count |
+|------------+-------|
+| 2024-01-15 |   278 |
+| 2024-03-01 |   167 |
+| 2024-03-02 |    15 |
+| 2024-03-03 |    30 |
+| 2024-03-06 |    83 |
+| 2024-03-07 |    71 |
+| 2024-03-14 |    18 |
+| 2024-05-08 |   278 |
+| 2024-05-23 |   278 |
+| 2024-07-21 |   278 |
+| 2024-08-27 |    11 |
+| 2024-09-15 |   278 |
+| 2024-09-26 |    16 |
+| 2024-10-04 |   278 |
+| 2024-10-19 |    21 |
+| 2024-10-22 |    13 |
+| 2024-12-05 |   278 |
+
+
+** Interpolated Parameters
+
+*** Tx
+
+
+** Derived Parameters

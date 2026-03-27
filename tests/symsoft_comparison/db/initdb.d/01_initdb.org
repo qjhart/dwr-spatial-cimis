@@ -1,5 +1,5 @@
 * Initialize Database
-#+PROPERTY: header-args:sql :engine postgresql :cmdline "service=cimis" :tangle yes
+#+PROPERTY: header-args:sql :engine postgresql :cmdline "service=symsoft" :tangle yes
 
 ** Initialization
 
@@ -32,43 +32,50 @@
  |----------------|
 
 
- #+BEGIN_SRC sql
-   drop table if exists cimis.stats cascade;
-   CREATE TABLE cimis.stats (
-     cat integer,
-     DAU_CODE varchar(3) ,
-     "date" date,
-     doy integer,
-     Tn_average DOUBLE PRECISION,
-     Tn_stddev DOUBLE PRECISION,
-     Tn_d_diff_average DOUBLE PRECISION,
-     Tn_d_diff_stddev DOUBLE PRECISION,
-     Tx_average DOUBLE PRECISION,
-     Tx_stddev DOUBLE PRECISION,
-     Tx_d_diff_average DOUBLE PRECISION,
-     Tx_d_diff_stddev DOUBLE PRECISION,
-     U2_average DOUBLE PRECISION,
-     U2_stddev DOUBLE PRECISION,
-     U2_d_diff_average DOUBLE PRECISION,
-     U2_d_diff_stddev DOUBLE PRECISION,
-     Rs_average DOUBLE PRECISION,
-     Rs_stddev DOUBLE PRECISION,
-     Rs_d_diff_average DOUBLE PRECISION,
-     Rs_d_diff_stddev DOUBLE PRECISION,
-     K_average DOUBLE PRECISION,
-     K_stddev DOUBLE PRECISION,
-     K_d_diff_average DOUBLE PRECISION,
-     K_d_diff_stddev DOUBLE PRECISION,
-     Rnl_average DOUBLE PRECISION,
-     Rnl_stddev DOUBLE PRECISION,
-     Rnl_d_diff_average DOUBLE PRECISION,
-     Rnl_d_diff_stddev DOUBLE PRECISION,
-     ETo_average DOUBLE PRECISION,
-     ETo_stddev DOUBLE PRECISION,
-     ETo_d_diff_average DOUBLE PRECISION,
-     ETo_d_diff_stddev DOUBLE PRECISION,
-      primary key(cat,date)
-   );
+*** Dish Comparisons
+
+  #+BEGIN_SRC sql
+    drop table if exists cimis.stats_d cascade;
+    CREATE TABLE stats_d (
+      cat integer,
+      DAU_CODE varchar(3),
+      hectares double precision ,
+      "date" date,
+      doy integer,
+      Tn_average DOUBLE PRECISION,
+      Tn_stddev DOUBLE PRECISION,
+      dTn_average DOUBLE PRECISION,
+      dTn_stddev DOUBLE PRECISION,
+      Tx_average DOUBLE PRECISION,
+      Tx_stddev DOUBLE PRECISION,
+      dTx_average DOUBLE PRECISION,
+      dTx_stddev DOUBLE PRECISION,
+      Tdew_average DOUBLE PRECISION,
+      Tdew_stddev DOUBLE PRECISION,
+      dTdew_average DOUBLE PRECISION,
+      dTdew_stddev DOUBLE PRECISION,
+      U2_average DOUBLE PRECISION,
+      U2_stddev DOUBLE PRECISION,
+      dU2_average DOUBLE PRECISION,
+      dU2_stddev DOUBLE PRECISION,
+      Rs_average DOUBLE PRECISION,
+      Rs_stddev DOUBLE PRECISION,
+      dRs_average DOUBLE PRECISION,
+      dRs_stddev DOUBLE PRECISION,
+      K_average DOUBLE PRECISION,
+      K_stddev DOUBLE PRECISION,
+      dK_average DOUBLE PRECISION,
+      dK_stddev DOUBLE PRECISION,
+      Rnl_average DOUBLE PRECISION,
+      Rnl_stddev DOUBLE PRECISION,
+      dRnl_average DOUBLE PRECISION,
+      dRnl_stddev DOUBLE PRECISION,
+      ETo_average DOUBLE PRECISION,
+      ETo_stddev DOUBLE PRECISION,
+      dETo_average DOUBLE PRECISION,
+      dETo_stddev DOUBLE PRECISION,
+      primary key(dau_code,date)
+    );
  #+END_SRC
 
  #+RESULTS:
@@ -76,13 +83,236 @@
  |--------------|
  | CREATE TABLE |
 
+Summarize over whole region
+
+#+begin_src sql
+  create view stats_d_ca as
+  with a as (
+    select
+      date,
+      doy,
+      sum(Tn_average*hectares)/sum(hectares) as Tn_average,
+      sum(Tn_stddev*hectares)/sum(hectares) as Tn_stddev,
+      sum(dTn_average*hectares)/sum(hectares) as dTn_average,
+      sum(dTn_stddev*hectares)/sum(hectares) as dTn_stddev,
+      sum(Tx_average*hectares)/sum(hectares) as Tx_average,
+      sum(Tx_stddev*hectares)/sum(hectares) as Tx_stddev,
+      sum(dTx_average*hectares)/sum(hectares) as dTx_average,
+      sum(dTx_stddev*hectares)/sum(hectares) as dTx_stddev,
+      sum(Tdew_average*hectares)/sum(hectares) as Tdew_average,
+      sum(Tdew_stddev*hectares)/sum(hectares) as Tdew_stddev,
+      sum(dTdew_average*hectares)/sum(hectares) as dTdew_average,
+      sum(dTdew_stddev*hectares)/sum(hectares) as dTdew_stddev,
+      sum(U2_average*hectares)/sum(hectares) as U2_average,
+      sum(U2_stddev*hectares)/sum(hectares) as U2_stddev,
+      sum(dU2_average*hectares)/sum(hectares) as dU2_average,
+      sum(dU2_stddev*hectares)/sum(hectares) as dU2_stddev,
+      sum(Rs_average*hectares)/sum(hectares) as Rs_average,
+      sum(Rs_stddev*hectares)/sum(hectares) as Rs_stddev,
+      sum(dRs_average*hectares)/sum(hectares) as dRs_average,
+      sum(dRs_stddev*hectares)/sum(hectares) as dRs_stddev,
+      sum(K_average*hectares)/sum(hectares) as K_average,
+      sum(K_stddev*hectares)/sum(hectares) as K_stddev,
+      sum(dK_average*hectares)/sum(hectares) as dK_average,
+      sum(dK_stddev*hectares)/sum(hectares) as dK_stddev,
+      sum(Rnl_average*hectares)/sum(hectares) as Rnl_average,
+      sum(Rnl_stddev*hectares)/sum(hectares) as Rnl_stddev,
+      sum(dRnl_average*hectares)/sum(hectares) as dRnl_average,
+      sum(dRnl_stddev*hectares)/sum(hectares) as dRnl_stddev,
+      sum(ETo_average*hectares)/sum(hectares) as ETo_average,
+      sum(ETo_stddev*hectares)/sum(hectares) as ETo_stddev,
+      sum(dETo_average*hectares)/sum(hectares) as dETo_average,
+      sum(dETo_stddev*hectares)/sum(hectares) as dETo_stddev
+      from stats_d
+     group by date,doy
+  )
+  select * from a;
+#+end_src
+
+#+RESULTS:
+|---|
+
 *** Copy data
 
 We are using the client to import data this time:
 
 #+begin_src sql :tangle no
-  truncate stats;
+  truncate stats_d;
     \COPY
   stats(cat,DAU_CODE,"date",doy,Tn_average,Tn_stddev,Tn_d_diff_average,Tn_d_diff_stddev,Tx_average,Tx_stddev,Tx_d_diff_average,Tx_d_diff_stddev,U2_average,U2_stddev,U2_d_diff_average,U2_d_diff_stddev,Rs_average,Rs_stddev,Rs_d_diff_average,Rs_d_diff_stddev,K_average,K_stddev,K_d_diff_average,K_d_diff_stddev,Rnl_average,Rnl_stddev,Rnl_d_diff_average,Rnl_d_diff_stddev,ETo_average,ETo_stddev,ETo_d_diff_average,ETo_d_diff_stddev)
   from stats with csv
 #+end_src
+
+*** Summarize outliers
+
+#+begin_src sql
+    create view stats_d_outliers as
+  (select date,doy,
+  'dTn_avg_n' as var,dTn_average as value
+  from stats_d_ca order by dTn_average
+  limit 5)
+  union
+  (select date,doy,
+  'dTn_avg_x' as var,dTn_average
+  from stats_d_ca order by dTn_average desc
+  limit 5)
+  union
+  (select date,doy,
+  'dTn_std_x' as var,dTn_stddev
+  from stats_d_ca order by dTn_stddev desc
+  limit 5)
+  union
+  (select date,doy,
+  'dTx_avg_n' as var,dTx_average
+  from stats_d_ca order by dTx_average
+  limit 5)
+  union
+  (select date,doy,
+  'dTx_avg_x' as var,dTx_average
+  from stats_d_ca order by dTx_average desc
+  limit 5)
+  union
+  (select date,doy,
+  'dTx_std_x' as var,dTx_stddev
+  from stats_d_ca order by dTx_stddev desc
+  limit 5)
+  union
+  (select date,doy,
+  'dTdew_avg_n' as var,dTdew_average
+  from stats_d_ca order by dTdew_average
+  limit 5)
+  union
+  (select date,doy,
+  'dTdew_avg_x' as var,dTdew_average
+  from stats_d_ca order by dTdew_average desc
+  limit 5)
+  union
+  (select date,doy,
+  'dTdew_std_x' as var,dTdew_stddev
+  from stats_d_ca order by dTdew_stddev desc
+  limit 5)
+  union
+  (select date,doy,
+  'dU2_avg_n' as var,dU2_average
+  from stats_d_ca order by dU2_average
+  limit 5)
+  union
+  (select date,doy,
+  'dU2_avg_x' as var,dU2_average
+  from stats_d_ca order by dU2_average desc
+  limit 5)
+  union
+  (select date,doy,
+  'dU2_std_x' as var,dU2_stddev
+  from stats_d_ca order by dU2_stddev desc
+  limit 5)
+  union
+  (select date,doy,
+  'dRs_avg_n' as var,dRs_average
+  from stats_d_ca order by dRs_average
+  limit 5)
+  union
+  (select date,doy,
+  'dRs_avg_x' as var,dRs_average
+  from stats_d_ca order by dRs_average desc
+  limit 5)
+  union
+  (select date,doy,
+  'dRs_std_x' as var,dRs_stddev
+  from stats_d_ca order by dRs_stddev desc
+  limit 5)
+  union
+  (select date,doy,
+  'dK_avg_n' as var,dK_average
+  from stats_d_ca order by dK_average
+  limit 5)
+  union
+  (select date,doy,
+  'dK_avg_x' as var,dK_average
+  from stats_d_ca order by dK_average desc
+  limit 5)
+  union
+  (select date,doy,
+  'dK_std_x' as var,dK_stddev
+  from stats_d_ca order by dK_stddev desc
+  limit 5)
+  union
+  (select date,doy,
+  'dRnl_avg_n' as var,dRnl_average
+  from stats_d_ca order by dRnl_average
+  limit 5)
+  union
+  (select date,doy,
+  'dRnl_avg_x' as var,dRnl_average
+  from stats_d_ca order by dRnl_average desc
+  limit 5)
+  union
+  (select date,doy,
+  'dRnl_std_x' as var,dRnl_stddev
+  from stats_d_ca order by dRnl_stddev desc
+  limit 5)
+  union
+  (select date,doy,
+  'dETo_avg_n' as var,dETo_average
+  from stats_d_ca order by dETo_average
+  limit 5)
+  union
+  (select date,doy,
+  'dETo_avg_x' as var,dETo_average
+  from stats_d_ca order by dETo_average desc
+  limit 5)
+  union
+  (select date,doy,
+  'dETo_std_x' as var,dETo_stddev
+  from stats_d_ca order by dETo_stddev desc
+  limit 5);
+#+end_src
+
+#+RESULTS:
+| CREATE VIEW |
+|-------------|
+
+*** Quinn Comparisons
+
+  #+BEGIN_SRC sql
+    drop table if exists cimis.stats_q cascade;
+    CREATE TABLE stats_q (
+      cat integer,
+      DAU_CODE varchar(3),
+      hectares double precision ,
+      "date" date,
+      doy integer,
+      Rs_average DOUBLE PRECISION,
+      Rs_stddev DOUBLE PRECISION,
+      dRs_average DOUBLE PRECISION,
+      dRs_stddev DOUBLE PRECISION,
+      K_average DOUBLE PRECISION,
+      K_stddev DOUBLE PRECISION,
+      dK_average DOUBLE PRECISION,
+      dK_stddev DOUBLE PRECISION,
+      primary key(dau_code,date)
+    );
+ #+END_SRC
+
+ #+RESULTS:
+ | DROP TABLE   |
+ |--------------|
+ | CREATE TABLE |
+
+
+*** Internet B2 count
+
+It's good to see how consistent the number of images retreived from the dish is.
+This can identify potentially bad days.
+
+#+begin_src sql
+  create table if not exists b2 (
+  "date" date primary key,
+  doy integer,
+  cnt integer
+  );
+#+end_src
+
+#+RESULTS:
+| CREATE TABLE |
+|--------------|

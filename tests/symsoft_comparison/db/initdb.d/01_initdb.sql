@@ -39,3 +39,87 @@ CREATE TABLE cimis.stats (
   ETo_d_diff_stddev DOUBLE PRECISION,
    primary key(cat,date)
 );
+
+drop table if exists cimis.stats_d cascade;
+CREATE TABLE stats_d (
+  cat integer,
+  DAU_CODE varchar(3),
+  hectares double precision ,
+  "date" date,
+  doy integer,
+  Tn_average DOUBLE PRECISION,
+  Tn_stddev DOUBLE PRECISION,
+  dTn_average DOUBLE PRECISION,
+  dTn_stddev DOUBLE PRECISION,
+  Tx_average DOUBLE PRECISION,
+  Tx_stddev DOUBLE PRECISION,
+  dTx_average DOUBLE PRECISION,
+  dTx_stddev DOUBLE PRECISION,
+  Tdew_average DOUBLE PRECISION,
+  Tdew_stddev DOUBLE PRECISION,
+  dTdew_average DOUBLE PRECISION,
+  dTdew_stddev DOUBLE PRECISION,
+  U2_average DOUBLE PRECISION,
+  U2_stddev DOUBLE PRECISION,
+  dU2_average DOUBLE PRECISION,
+  dU2_stddev DOUBLE PRECISION,
+  Rs_average DOUBLE PRECISION,
+  Rs_stddev DOUBLE PRECISION,
+  dRs_average DOUBLE PRECISION,
+  dRs_stddev DOUBLE PRECISION,
+  K_average DOUBLE PRECISION,
+  K_stddev DOUBLE PRECISION,
+  dK_average DOUBLE PRECISION,
+  dK_stddev DOUBLE PRECISION,
+  Rnl_average DOUBLE PRECISION,
+  Rnl_stddev DOUBLE PRECISION,
+  dRnl_average DOUBLE PRECISION,
+  dRnl_stddev DOUBLE PRECISION,
+  ETo_average DOUBLE PRECISION,
+  ETo_stddev DOUBLE PRECISION,
+  dETo_average DOUBLE PRECISION,
+  dETo_stddev DOUBLE PRECISION,
+  primary key(dau_code,date)
+);
+
+create view stats_d_ca as
+with a as (
+  select
+    date,
+    doy,
+    sum(Tn_average*hectares)/sum(hectares) as Tn_average,
+    sum(Tn_stddev*hectares)/sum(hectares) as Tn_stddev,
+    sum(dTn_average*hectares)/sum(hectares) as dTn_average,
+    sum(dTn_stddev*hectares)/sum(hectares) as dTn_stddev,
+    sum(Tx_average*hectares)/sum(hectares) as Tx_average,
+    sum(Tx_stddev*hectares)/sum(hectares) as Tx_stddev,
+    sum(dTx_average*hectares)/sum(hectares) as dTx_average,
+    sum(dTx_stddev*hectares)/sum(hectares) as dTx_stddev,
+    sum(Tdew_average*hectares)/sum(hectares) as Tdew_average,
+    sum(Tdew_stddev*hectares)/sum(hectares) as Tdew_stddev,
+    sum(dTdew_average*hectares)/sum(hectares) as dTdew_average,
+    sum(dTdew_stddev*hectares)/sum(hectares) as dTdew_stddev,
+    sum(U2_average*hectares)/sum(hectares) as U2_average,
+    sum(U2_stddev*hectares)/sum(hectares) as U2_stddev,
+    sum(dU2_average*hectares)/sum(hectares) as dU2_average,
+    sum(dU2_stddev*hectares)/sum(hectares) as dU2_stddev,
+    sum(Rs_average*hectares)/sum(hectares) as Rs_average,
+    sum(Rs_stddev*hectares)/sum(hectares) as Rs_stddev,
+    sum(dRs_average*hectares)/sum(hectares) as dRs_average,
+    sum(dRs_stddev*hectares)/sum(hectares) as dRs_stddev,
+    sum(K_average*hectares)/sum(hectares) as K_average,
+    sum(K_stddev*hectares)/sum(hectares) as K_stddev,
+    sum(dK_average*hectares)/sum(hectares) as dK_average,
+    sum(dK_stddev*hectares)/sum(hectares) as dK_stddev,
+    sum(Rnl_average*hectares)/sum(hectares) as Rnl_average,
+    sum(Rnl_stddev*hectares)/sum(hectares) as Rnl_stddev,
+    sum(dRnl_average*hectares)/sum(hectares) as dRnl_average,
+    sum(dRnl_stddev*hectares)/sum(hectares) as dRnl_stddev,
+    sum(ETo_average*hectares)/sum(hectares) as ETo_average,
+    sum(ETo_stddev*hectares)/sum(hectares) as ETo_stddev,
+    sum(dETo_average*hectares)/sum(hectares) as dETo_average,
+    sum(dETo_stddev*hectares)/sum(hectares) as dETo_stddev
+    from stats_d
+   group by date,doy
+)
+select * from a;

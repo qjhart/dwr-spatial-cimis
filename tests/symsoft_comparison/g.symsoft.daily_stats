@@ -29,6 +29,13 @@ export GRASS_VERBOSE=5
 #% description: Calculate 28day RMS error
 #% guisection: Main
 #%end
+#%option
+#% key: ref
+#% type: string
+#% description: mapset to compare to d=dish, ''=new
+#% required: no
+#% guisection: Main
+#%end
 
 function G_verify_mapset() {
   if [[ ! ${GBL[MAPSET]} =~ ^20[012][0-9][01][0-9][0-3][0-9]_s$ ]]; then
@@ -44,12 +51,12 @@ function diff() {
     s='_'$s
   fi
   local ref=${GBL[YYYYMMDD]}${s}
-  g.message -v message="r.mapcalc ${GBL[overwrite]} --quiet expression=\"d${var}${s}=${var}-'${var}@$ref'\"";
-  r.mapcalc ${GBL[overwrite]} --quiet expression="d${var}${s}=${var}-'${var}@$ref'";
+  g.message -v message="r.mapcalc --overwrite --quiet expression=\"d${var}${s}=${var}-'${var}@$ref'\"";
+  r.mapcalc --overwrite --quiet expression="d${var}${s}=${var}-'${var}@$ref'";
 }
 
 function stats_make() {
-  local s=$1 # d or '' (dish or '')
+  local s=$1
   if [[ $s != "" ]]; then
     s='_'$s
   fi
@@ -64,7 +71,7 @@ function stats_make() {
 
 
 function stats_add() {
-  local s=$1 # d or '' (dish or '')
+  local s=$1
   if [[ $s != "" ]]; then
     s='_'$s
   fi
@@ -107,21 +114,30 @@ GBL[constant_mapset]=500m
 GBL[interpolate]="Tn Tx Tdew U2"
 GBL[solar]="Rs K"
 GBL[calc]="Rnl ETo"
+GBL[ref]="d"
 
-# Get Options
-if [ $GIS_FLAG_F -eq 1 ] ; then
-  GBL[overwrite]='--overwrite'
-else
-  GBL[overwrite]=''
+
+if [ -n "$GIS_OPT_REF" ] ; then
+  if [[ $GIS_OPT_REF =~ ^d$ ]]; then
+    GBL[ref]='d'
+  elif [[ $GIS_OPT_REF =~ ^q$ ]]; then
+    GBL[ref]='q'
+  else
+    g.message -e message="Invalid compare_to option ${GIS_OPT_REF}"
+    exit 1
+  fi
 fi
+
 
 G_verify_mapset
 
-for ref in 'd'; do
-  stats_make $ref
+#for ref in ${GBL[compare]}; do
+ref=${GBL[ref]}
   g.message -v message="Stats w.r.t ($ref) [Tn|Tx|Tdew|U2|Rs|K|Rnl|ETo]@${GBL[MAPSET]}"
+  stats_make $ref
   for m in ${GBL[interpolate]} ${GBL[solar]} ${GBL[calc]}; do
+    g.message -v message="Calculating stats w.r.t ($ref) $m@${GBL[MAPSET]}"
     diff $ref $m
     stats_add $ref $m
   done
-done
+#done
