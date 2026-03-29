@@ -1,0 +1,21 @@
+{
+  "def":{
+    "org":"us-west1-docker.pkg.dev/dwr-spatial-cimis/docker",
+    "tag":"__git__",
+    "auth": {
+      "service_account":"service-account"
+    },
+    "gcs":{
+      "bucket":"fcrepo-2"
+    }
+  },
+  "build":{
+  },
+  "dev":{
+    "org":"localhost/dwr-spatial-cimis",
+    "tag":"dirty",
+    "gcs":{
+      "bucket":"fcrepo-dev"
+    }
+  }
+}
