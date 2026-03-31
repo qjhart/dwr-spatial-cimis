@@ -12,16 +12,19 @@ ETo. We can look at Symsoft over estimations (+ diff) and under estimations.
 
 On the over estimation side, you see that these are
 
+#+tblname: eto_asc
 #+begin_src sql
-    select date,doy,dau_code,ETo_average,deto_average
-    from stats_d
-  --  where date not in ('2024-05-08','2024-05-23','2024-03-14')
---  where dau_code in ('347')
-    order by deto_average
-    limit 25
+      select date,doy,dau_code,ETo_average,deto_average
+      from stats_d
+  where eto_average is not null
+--  and date not in ('2024-07-21')
+      order by deto_average
+      limit 25
 #+end_src
 
-#+RESULTS:
+Largest Negative
+
+#+RESULTS: eto_asc
 |       date | doy | dau_code |      eto_average |      deto_average |
 |------------+-----+----------+------------------+-------------------|
 | 2024-09-23 | 267 |      020 | 5.42345048928285 |  -2.3845556808547 |
@@ -50,75 +53,306 @@ On the over estimation side, you see that these are
 | 2024-09-22 | 266 |      032 | 4.15316526471939 | -1.71115582349648 |
 | 2024-09-27 | 271 |      020 | 4.30203081311256 | -1.70519185385529 |
 
-When you look the highest diffs (order desc), you can see this is mostly because
-of of a few days, which you can remove a few of these days ~where date not in
-('2024-05-08','2024-05-23','2024-03-14')~
+Largest ETo differences
 
-#+RESULTS: foo
-|       date | doy | dau_code |           eto_average | eto_d_diff_average |
-|------------+-----+----------+-----------------------+--------------------|
-| 2024-02-06 |  37 |      325 |   -0.0981781527038937 |   1.28375159524598 |
-| 2024-02-06 |  37 |      327 |    0.0551757940272871 |   1.21424295014019 |
-| 2024-02-06 |  37 |      322 |    -0.133033331060946 |   1.20119731847334 |
-| 2024-02-04 |  35 |          |    -0.434662733317306 |   1.16691191608282 |
-| 2024-02-06 |  37 |      321 |   -0.0475207739925781 |   1.12728073356975 |
-| 2024-02-05 |  36 |          |     -0.27932596234225 |   1.11548325301671 |
-| 2024-02-06 |  37 |      323 | -9.89068171372549e-05 |   1.09412500013597 |
-| 2024-01-15 |  15 |      087 |     0.259204099061073 |   1.08160410184847 |
-| 2024-01-15 |  15 |      089 |     0.283684467798928 |   1.07637058170474 |
-| 2024-01-15 |  15 |          |   -0.0647805325594737 |   1.07189462250796 |
-| 2024-01-15 |  15 |      355 |     0.825888481072076 |   1.06395528344036 |
-| 2024-02-06 |  37 |      324 |     0.150055082781237 |     1.046409590091 |
-| 2024-01-15 |  15 |      354 |     0.880731028443277 |   1.04517404271495 |
-| 2024-01-15 |  15 |      357 |     0.901373268192827 |   1.02953231242681 |
-| 2024-02-06 |  37 |      320 |   -0.0274778117447752 |   1.01196058388436 |
-| 2024-01-15 |  15 |      090 |     0.466975501759183 |   1.01151678901675 |
-| 2024-01-15 |  15 |      353 |     0.865084678851801 |   1.00670114037613 |
-| 2024-01-15 |  15 |      096 |     0.432676740976162 |   1.00432444491589 |
-| 2024-01-15 |  15 |      075 |     0.267057258307891 |  0.978092016565099 |
-| 2024-01-15 |  15 |      092 |     0.488019376683287 |  0.969466776386812 |
-| 2024-01-15 |  15 |      073 |     0.318460117574073 |  0.969031240828252 |
-| 2024-01-15 |  15 |      081 |      0.46375548512943 |  0.957346838860638 |
-| 2024-01-15 |  15 |      074 |     0.334821877973377 |  0.954842223890084 |
-| 2024-01-15 |  15 |      347 |     0.999264252667277 |   0.94791479793173 |
-| 2024-01-15 |  15 |      356 |     0.893867511572148 |  0.947232128867881 |
+#+RESULTS: eto_desc
+|       date | doy | dau_code |      eto_average |     deto_average |
+|------------+-----+----------+------------------+------------------|
+| 2024-07-21 | 203 |      289 | 6.87369487060434 | 3.78564930033148 |
+| 2024-07-21 | 203 |      288 | 7.04036537516363 | 3.74939723878504 |
+| 2024-07-21 | 203 |      287 | 7.27205283196245 | 3.70519996396913 |
+| 2024-07-21 | 203 |      290 | 6.56035804290494 | 3.61912256748611 |
+| 2024-07-21 | 203 |      286 | 6.30868948944651 | 3.51888984755578 |
+| 2024-07-21 | 203 |      317 | 6.04954333051945 | 3.48293110311778 |
+| 2024-07-21 | 203 |      339 | 6.65635108395603 | 3.44143850654974 |
+| 2024-07-21 | 203 |      285 | 7.10600610594643 | 3.43779298159415 |
+| 2024-07-21 | 203 |      316 | 6.28068276732877 | 3.42890462341381 |
+| 2024-07-21 | 203 |      329 | 6.28047151567067 | 3.42877401876835 |
+| 2024-07-21 | 203 |      350 | 4.40700162637151 | 3.42278562668872 |
+| 2024-05-23 | 144 |      290 | 5.78761377431782 | 3.39154046412555 |
+| 2024-07-21 | 203 |      293 | 6.16200200853139 | 3.38724014941368 |
+| 2024-07-21 | 203 |      352 | 4.51324804720702 | 3.38508711388875 |
+| 2024-05-23 | 144 |      291 | 5.61056944140493 | 3.37774841504946 |
+| 2024-07-21 | 203 |      284 | 6.42006689996994 | 3.37409709644926 |
+| 2024-07-21 | 203 |      252 | 4.19056513163553 | 3.37301852341686 |
+| 2024-07-21 | 203 |      340 | 7.04325710599971 | 3.36603738185179 |
+| 2024-05-23 | 144 |      289 | 5.93699095451592 | 3.35942267396114 |
+| 2024-07-21 | 203 |      330 | 6.13803464864361 | 3.35805670576885 |
+| 2024-07-21 | 203 |      291 | 6.37026294978353 | 3.34413145841118 |
+| 2024-07-21 | 203 |      144 | 3.33521176205975 | 3.33944563939364 |
+| 2024-05-23 | 144 |      330 | 5.33925546271268 | 3.33769726909008 |
+| 2024-07-21 | 203 |      337 | 4.69291522069936 | 3.31296834718812 |
+| 2024-07-21 | 203 |      351 | 5.64219171024071 | 3.31000179325637 |
 
 However, if you look at the largest negative values, these all clustered around
 a particular dau_code.  If you look, dau_code 347, Yuma, is the south-eastern
 most DAU.
 
-#+tblname: neg_diff
-#+RESULTS:
-|       date | dau_code |      eto_average | eto_d_diff_average |
-|------------+----------+------------------+--------------------|
-| 2024-05-18 |      347 | 11.1265022161969 |  -2.12335348225718 |
-| 2024-06-01 |      347 | 9.71912067731518 |    -2.000189801209 |
-| 2024-05-17 |      347 | 9.43390611877439 |  -1.97568660569204 |
-| 2024-05-20 |      347 | 10.8448270011234 |  -1.93088542537768 |
-| 2024-06-15 |      347 |  10.316324612656 |  -1.72966550321246 |
-| 2024-06-16 |      347 | 10.6777551661846 |  -1.65373835072055 |
-| 2024-04-24 |      347 | 8.00703923683512 |  -1.60031169197913 |
-| 2024-05-19 |      347 | 10.7619095630977 |  -1.59832465192713 |
-| 2024-05-18 |      356 | 11.0981782274568 |  -1.59255529883607 |
-| 2024-06-13 |      347 | 9.13123784343252 |  -1.56340022653679 |
-| 2024-05-04 |      347 |  8.4089072222943 |  -1.53200683681235 |
-| 2024-03-29 |      347 | 7.31628669414388 |  -1.50962690771064 |
-| 2024-06-08 |      347 | 9.86141196997489 |   -1.5047525443072 |
-| 2024-06-28 |      347 | 9.99482607231125 |  -1.48313254979105 |
-| 2024-05-17 |      356 | 9.36152579361089 |  -1.46279225772974 |
-| 2024-06-01 |      356 | 9.53839007019037 |  -1.45310709585171 |
-| 2024-05-20 |      356 | 10.8758954739992 |  -1.44871444983957 |
-| 2024-04-18 |      347 | 6.84928727245782 |  -1.44781496503824 |
-| 2024-06-05 |      347 | 9.19333419498974 |  -1.44622334423141 |
-| 2024-06-03 |      347 | 8.50746369294141 |  -1.44189453606932 |
-| 2024-06-07 |      347 | 9.69280431177519 |   -1.4241775936938 |
-| 2024-04-23 |      347 | 7.15990186018348 |  -1.37021338338646 |
-| 2024-03-03 |      347 | 5.60399297398049 |  -1.35063251186047 |
-| 2024-05-16 |      347 | 7.85381471528536 |   -1.3395328501297 |
-| 2024-04-13 |      347 | 6.98385990333863 |  -1.33624520875795 |
+*** eto
+#+tblname: caetod
+#+begin_src sql
+  with s as (
+    select date,sum(hectares*dEto_average)/sum(hectares) as dEto
+      from stats_d group by date
+  ),
+    b as (
+      select date,(10*deto)::integer as dEto
+        from s
+    )
+  select (dEto/10.0)::decimal(3,1) as deto,count(*) from b group by deto order by deto;
+#+end_src
+
+#+RESULTS: caetod
+| deto | count |
+|------+-------|
+| -0.1 |     2 |
+|  0.0 |   107 |
+|  0.1 |   232 |
+|  0.2 |    12 |
+|  0.3 |     1 |
+|  0.6 |     1 |
+|  0.9 |     1 |
+|  1.3 |     1 |
+|  1.5 |     1 |
+|  1.9 |     2 |
+|  2.0 |     1 |
+|  2.4 |     1 |
+|  3.0 |     1 |
+
+#+tblname: caetodate
+#+begin_src sql
+    with s as (
+      select date,sum(hectares*deto_average)/sum(hectares) as deto
+        from stats_d group by date
+    ),
+      b as (
+        select date,(10*deto)::integer as deto
+          from s
+      )
+    select date,s.deto::decimal(3,2) from b join s using (date) where (abs(b.deto)>=3)
+  order by date
+#+end_src
+
+#+RESULTS: caetodate
+|       date | deto |
+|------------+------|
+| 2024-01-15 | 0.65 |
+| 2024-03-14 | 1.30 |
+| 2024-05-08 | 2.03 |
+| 2024-05-23 | 2.35 |
+| 2024-07-02 | 0.27 |
+| 2024-07-21 | 2.98 |
+| 2024-09-15 | 1.89 |
+| 2024-10-04 | 1.87 |
+| 2024-10-28 | 1.52 |
+| 2024-12-05 | 0.88 |
+
+#+tblname: daueto
+#+begin_src sql
+  with s as (
+    select date,dau_code as dau,deto_average::decimal(5,1) as deto
+      from stats_d
+  ),
+    n as (
+      select dau,count(*) as lt3
+        from s where deto<-4 group by dau
+    ),
+      x as (
+      select dau,count(*) as gt3
+        from s where deto>3 group by dau
+    )
+  select * from n full outer join x using(dau) order by dau;
+#+end_src
+
+#+RESULTS: daueto
+| dau | lt3 | gt3 |
+|-----+-----+-----|
+| 001 |     |   1 |
+| 002 |     |   1 |
+| 004 |     |   1 |
+| 069 |     |   1 |
+| 076 |     |   1 |
+| 081 |     |   1 |
+| 083 |     |   1 |
+| 104 |     |   1 |
+| 120 |     |   1 |
+| 136 |     |   1 |
+| 139 |     |   1 |
+| 141 |     |   1 |
+| 142 |     |   1 |
+| 143 |     |   1 |
+| 144 |     |   1 |
+| 145 |     |   1 |
+| 147 |     |   1 |
+| 154 |     |   1 |
+| 156 |     |   1 |
+| 158 |     |   1 |
+| 159 |     |   1 |
+| 160 |     |   1 |
+| 161 |     |   1 |
+| 163 |     |   1 |
+| 164 |     |   1 |
+| 165 |     |   1 |
+| 166 |     |   1 |
+| 167 |     |   1 |
+| 168 |     |   1 |
+| 170 |     |   1 |
+| 171 |     |   1 |
+| 176 |     |   1 |
+| 194 |     |   1 |
+| 195 |     |   1 |
+| 196 |     |   1 |
+| 197 |     |   1 |
+| 198 |     |   1 |
+| 199 |     |   1 |
+| 200 |     |   1 |
+| 201 |     |   1 |
+| 202 |     |   1 |
+| 204 |     |   1 |
+| 207 |     |   1 |
+| 209 |     |   1 |
+| 210 |     |   1 |
+| 211 |     |   1 |
+| 212 |     |   1 |
+| 213 |     |   1 |
+| 214 |     |   1 |
+| 215 |     |   1 |
+| 221 |     |   1 |
+| 230 |     |   1 |
+| 231 |     |   1 |
+| 232 |     |   1 |
+| 233 |     |   1 |
+| 234 |     |   1 |
+| 235 |     |   1 |
+| 236 |     |   1 |
+| 240 |     |   1 |
+| 252 |     |   1 |
+| 253 |     |   1 |
+| 258 |     |   1 |
+| 260 |     |   1 |
+| 261 |     |   1 |
+| 279 |     |   1 |
+| 282 |     |   1 |
+| 283 |     |   1 |
+| 284 |     |   1 |
+| 285 |     |   1 |
+| 286 |     |   2 |
+| 287 |     |   2 |
+| 288 |     |   2 |
+| 289 |     |   2 |
+| 290 |     |   2 |
+| 291 |     |   2 |
+| 292 |     |   2 |
+| 293 |     |   2 |
+| 294 |     |   1 |
+| 295 |     |   1 |
+| 296 |     |   1 |
+| 297 |     |   1 |
+| 298 |     |   1 |
+| 299 |     |   1 |
+| 300 |     |   1 |
+| 301 |     |   1 |
+| 302 |     |   1 |
+| 303 |     |   1 |
+| 304 |     |   1 |
+| 305 |     |   1 |
+| 306 |     |   1 |
+| 307 |     |   1 |
+| 310 |     |   1 |
+| 311 |     |   1 |
+| 312 |     |   1 |
+| 313 |     |   1 |
+| 315 |     |   1 |
+| 316 |     |   2 |
+| 317 |     |   2 |
+| 318 |     |   1 |
+| 321 |     |   1 |
+| 322 |     |   1 |
+| 323 |     |   1 |
+| 325 |     |   1 |
+| 326 |     |   1 |
+| 327 |     |   1 |
+| 328 |     |   1 |
+| 329 |     |   2 |
+| 330 |     |   2 |
+| 331 |     |   1 |
+| 332 |     |   1 |
+| 336 |     |   1 |
+| 337 |     |   1 |
+| 338 |     |   1 |
+| 339 |     |   2 |
+| 340 |     |   2 |
+| 341 |     |   1 |
+| 348 |     |   1 |
+| 349 |     |   1 |
+| 350 |     |   1 |
+| 351 |     |   1 |
+| 352 |     |   1 |
+| 354 |     |   1 |
+| 355 |     |   1 |
+| 357 |     |   1 |
+| 401 |     |   1 |
+| 402 |     |   1 |
+
+#+tblname: daueto_date
+#+begin_src sql
+  with s as (
+    select date,dau_code as dau,deto_average::decimal(5,1) as deto
+      from stats_d
+  ),
+    n as (
+      select date,count(*) as lt2
+        from s where deto<-2 group by date
+    ),
+      x as (
+      select date,count(*) as gt2
+        from s where deto>2 group by date
+    )
+  select * from n full outer join x using(date) order by date;
+#+end_src
+
+#+RESULTS: daueto_date
+|       date | lt2 | gt2 |
+|------------+-----+-----|
+| 2024-05-08 |     | 173 |
+| 2024-05-18 |   1 |     |
+| 2024-05-23 |     | 245 |
+| 2024-07-21 |     | 268 |
+| 2024-09-15 |     | 117 |
+| 2024-09-23 |   3 |     |
+| 2024-09-29 |   3 |     |
+| 2024-10-04 |     |  80 |
+| 2024-10-28 |     |  21 |
+
+
+*** Show one Statewide Parameter
+
+This shows the DAUs
+#+name:ca_diff
+#+begin_src bash :results raw :var m="cairo" :var v="ETo" :var d="20240701" :var color="-5 red\n-2.5 orange\n0 white\n2.5 green\n5 blue"
+  export v=$v
+  export d=$d
+  export m=$m
+  export f="d_${v}_${d}.png"
+  export color="$color"
+  grass --text ~/dwr-spatial-cimis/gdb/cimis/quinn
+  d.mon start=$m width=1500 height=500 output=$f --overwrite
+  d.frame -c frame=l at=0,100,0,33
+  d.frame -c frame=c at=0,100,33,66
+  d.frame -c frame=r at=0,100,66,99
+  d.frame frame=l; r.colors map=$v@${d}_s rast=${v}@default_colors; d.rast $v@${d}_s
+  d.frame frame=r; r.colors map=$v@${d}_d rast=${v}@default_colors; d.rast $v@${d}_d
+  echo $"$color" | r.colors map=d${v}_d@${d}_s rules=-
+  d.frame frame=c; d.rast d${v}_d@${d}_s
+  d.mon stop=$m
+  echo "[[file:$f]]"
+#+end_src
+
+#+RESULTS: ca_diff
+[[file:d_ETo_20240701.png]]
+
 
 * Constants
-
 ** DAUs
 
 This shows the DAUs
@@ -167,12 +401,11 @@ This shows the DAUs
 #+RESULTS: zipcodes2019
 [[file:zipcodes2019.png]]
 
-
-** Radiation
+* Radiation
 
 Here are some graphs specific for the radiation parameters.
 
-*** Big differences between dish tah
+** Big differences between dish and internet
 
 #+name: delta_dish_10
 #+begin_src sql
@@ -201,9 +434,48 @@ Here are some graphs specific for the radiation parameters.
 | 2024-10-22 |    13 |
 | 2024-12-05 |   278 |
 
+#+name: delta_web_1
+#+begin_src sql
+   with a as (
+   select date,count(*) as daus  from stats_q
+   where abs(dRs_average/Rs_average) > 0.01
+   group by date )
+  select date,daus,cnt as b2_cnt from a join b2 using (date) order by date;
 #+end_src
 
-*** How many images per day?
+#+RESULTS: delta_web_1
+|       date | daus | b2_cnt |
+|------------+------+--------|
+| 2024-01-11 |   16 |     33 |
+| 2024-02-18 |   11 |     37 |
+| 2024-03-11 |    4 |     39 |
+| 2024-03-18 |   26 |     40 |
+| 2024-04-11 |   19 |     42 |
+| 2024-09-18 |   10 |     40 |
+| 2024-09-28 |    2 |     40 |
+| 2024-10-11 |    2 |     37 |
+| 2024-10-18 |   69 |     37 |
+| 2024-11-11 |   86 |     35 |
+| 2024-11-18 |   20 |     34 |
+| 2024-12-11 |   23 |     33 |
+| 2024-12-18 |   24 |     33 |
+
+#+name: delta_web_K_1
+#+begin_src sql
+   with a as (
+   select date,count(*) as daus  from stats_q
+   where abs(dK_average/K_average) > 0.01
+   group by date )
+  select date,daus,cnt as b2_cnt from a join b2 using (date) order by date;
+#+end_src
+
+#+RESULTS: delta_web_K_1
+|       date | daus | b2_cnt |
+|------------+------+--------|
+| 2024-09-28 |    2 |     40 |
+
+
+** How many images per day?
 
 #+tblname: b2perday
 #+begin_src sql
@@ -601,3 +873,1067 @@ Here are some graphs specific for the radiation parameters.
 
 #+RESULTS:
 [[file:b2_per_day.png]]
+
+* Spatial Interpolations
+** Tx
+#+name: ca_var_d
+#+begin_src sql :var v="dTx"
+  with s as (
+    select date,sum(hectares*$v_average)/sum(hectares) as $v
+      from stats_d group by date
+  ),
+    b as (
+      select date,(10*$v)::integer as $v
+        from s
+    )
+  select ($v/10.0)::decimal(3,1) as $v,count(*) from b group by $v order by $v;
+#+end_src
+
+#+RESULTS: ca_var_d
+|  dtx | count |
+|------+-------|
+| -0.8 |     1 |
+| -0.6 |     2 |
+| -0.5 |     4 |
+| -0.4 |     4 |
+| -0.3 |     5 |
+| -0.2 |    15 |
+| -0.1 |   109 |
+|  0.0 |   196 |
+|  0.1 |    26 |
+|  0.7 |     1 |
+
+#+CALL: ca_var_d(v="dTx")
+
+#+RESULTS:
+|  dtx | count |
+|------+-------|
+| -0.8 |     1 |
+| -0.6 |     2 |
+| -0.5 |     4 |
+| -0.4 |     4 |
+| -0.3 |     5 |
+| -0.2 |    15 |
+| -0.1 |   109 |
+|  0.0 |   196 |
+|  0.1 |    26 |
+|  0.7 |     1 |
+
+#+tblname: ca_var_date
+#+begin_src sql :var v="dTx" :var x=3
+    with s as (
+      select date,sum(hectares*$v_average)/sum(hectares) as $v
+        from stats_d group by date
+    ),
+      b as (
+        select date,(10*$v)::integer as $v
+          from s
+      )
+    select date,s.$v::decimal(3,2) from b join s using (date) where (abs(b.$v)>=$x)
+  order by date
+#+end_src
+
+
+#+tblname: dau_var
+#+begin_src sql :var v="dTx" x=10
+  with s as (
+    select date,dau_code as dau,$v_average::decimal(5,1) as $v
+      from stats_d
+  ),
+    n as (
+      select dau,count(*) as lt$x
+        from s where $v<-$x group by dau
+    ),
+      x as (
+      select dau,count(*) as gt$x
+        from s where $v>$x group by dau
+    )
+  select * from n full outer join x using(dau) order by dau;
+#+end_src
+
+#+RESULTS: dau_var
+| dau | lt10 | gt10 |
+|-----+------+------|
+| 020 |   10 |      |
+| 021 |    8 |      |
+| 023 |    2 |      |
+| 027 |   10 |      |
+| 028 |    1 |      |
+| 030 |    2 |      |
+| 032 |   10 |      |
+| 291 |      |    1 |
+| 330 |      |    1 |
+| 339 |      |    1 |
+
+
+#+tblname: dau_var_date
+#+begin_src sql
+  with s as (
+    select date,dau_code as dau,$v_average::decimal(5,1) as $v
+      from stats_d
+  ),
+    n as (
+      select date,count(*) as lt$x
+        from s where $v<-$x group by date
+    ),
+      x as (
+      select date,count(*) as gt$x
+        from s where $v>$x group by date
+    )
+  select * from n full outer join x using(date) order by date;
+#+end_src
+
+#+RESULTS: dautx_date
+|       date | lt$x | gt$x |
+|------------+------+------|
+| 2024-07-02 |      |    3 |
+| 2024-09-19 |    4 |      |
+| 2024-09-20 |    3 |      |
+| 2024-09-21 |    4 |      |
+| 2024-09-22 |    6 |      |
+| 2024-09-23 |    7 |      |
+| 2024-09-24 |    4 |      |
+| 2024-09-26 |    3 |      |
+| 2024-09-27 |    4 |      |
+| 2024-09-28 |    4 |      |
+| 2024-09-29 |    4 |      |
+
+** Tn
+
+#+CALL: ca_var_d(v="dTn")
+
+#+RESULTS:
+|  dtn | count |
+|------+-------|
+| -0.3 |     3 |
+| -0.2 |     7 |
+| -0.1 |   110 |
+|  0.0 |   168 |
+|  0.1 |    73 |
+|  0.2 |     1 |
+|  0.5 |     1 |
+
+#+call: ca_var_date(v="dTn",x=3)
+
+#+RESULTS:
+|       date |   dtn |
+|------------+-------|
+| 2024-07-02 |  0.49 |
+| 2024-09-21 | -0.29 |
+| 2024-09-22 | -0.27 |
+| 2024-09-23 | -0.31 |
+
+#+call: dau_var(v="dTn",x=6)
+
+#+RESULTS:
+| dau | lt6 | gt6 |
+|-----+-----+-----|
+| 020 |   2 |     |
+| 027 |   2 |     |
+| 032 |   2 |     |
+| 262 |     |   1 |
+| 290 |     |   1 |
+| 291 |     |   1 |
+| 330 |     |   1 |
+| 339 |     |   1 |
+| 340 |     |   1 |
+
+#+call: dau_var_date(v="dTn",x=6)
+
+#+RESULTS:
+|       date | lt6 | gt6 |
+|------------+-----+-----|
+| 2024-07-02 |     |   5 |
+| 2024-08-25 |     |   1 |
+| 2024-09-22 |   3 |     |
+| 2024-09-23 |   3 |     |
+
+
+** Tdew
+#+CALL: ca_var_d(v="dTdew")
+
+#+call: ca_var_date(v="dTdew",x=3)
+
+#+call: dau_var(v="dTdew",x=6)
+
+#+call: dau_var_date(v="dTdew",x=6)
+
+** U2
+
+#+CALL: ca_var_d(v="dTdew")
+
+#+call: ca_var_date(v="dTdew",x=3)
+
+#+call: dau_var(v="dTdew",x=1)
+
+#+call: dau_var_date(v="dTdew",x=1)
+
+
+** RNL
+
+#+CALL: ca_var_d(v="dRnl")
+
+#+RESULTS:
+| drnl | count |
+|------+-------|
+| -1.4 |     1 |
+| -0.7 |     2 |
+| -0.6 |     3 |
+| -0.5 |    11 |
+| -0.4 |    33 |
+| -0.3 |   107 |
+| -0.2 |   113 |
+| -0.1 |    74 |
+|  0.0 |    13 |
+|  0.3 |     1 |
+|  0.4 |     1 |
+|  0.9 |     1 |
+|  6.0 |     1 |
+|  7.3 |     1 |
+|  8.3 |     1 |
+
+#+call: ca_var_date(v="dRnl",x=10)
+
+#+RESULTS:
+|       date |  drnl |
+|------------+-------|
+| 2024-01-15 | -1.45 |
+| 2024-03-14 |  8.26 |
+| 2024-09-15 |  5.97 |
+| 2024-10-28 |  7.34 |
+
+#+CALL: ca_diff(v="Rnl",d="20240313")
+
+#+RESULTS:
+[[file:d_Rnl_20240313.png]]
+
+
+#+CALL: ca_diff(v="Rnl",d="20240314")
+
+#+RESULTS:
+[[file:d_Rnl_20240314.png]]
+
+#+CALL: ca_diff(v="Rnl",d="20240914")
+
+#+RESULTS:
+[[file:d_Rnl_20240914.png]]
+
+
+#+CALL: ca_diff(v="Rnl",d="20240915")
+
+#+RESULTS:
+[[file:d_Rnl_20240915.png]]
+
+#+CALL: ca_diff(v="Tdew",d="20240314")
+
+#+RESULTS:
+[[file:d_Tdew_20240314.png]]
+
+
+
+#+call: dau_var(v="dRnl",x=10)
+
+#+RESULTS:
+| dau | lt10 | gt10 |
+|-----+------+------|
+| 096 |      |    1 |
+| 279 |      |    1 |
+| 282 |      |    1 |
+| 283 |      |    1 |
+| 284 |      |    1 |
+| 285 |      |    1 |
+| 286 |      |    1 |
+| 287 |      |    1 |
+| 288 |      |    2 |
+| 289 |      |    1 |
+| 290 |      |    1 |
+| 291 |      |    1 |
+| 292 |      |    1 |
+| 298 |      |    1 |
+| 317 |      |    1 |
+| 329 |      |    1 |
+| 330 |      |    1 |
+| 339 |      |    1 |
+
+#+call: dau_var_date(v="dRnl",x=10)
+
+#+RESULTS:
+|       date | lt10 | gt10 |
+|------------+------+------|
+| 2024-03-14 |      |    2 |
+| 2024-10-28 |      |   17 |
+
+
+* Station Tables
+
+#+name: date_by_var
+#+begin_src sql :tangle no :var v="day_air_tmp_max"
+  with s as (
+    select station_id,date,$v as s_v,$v_qc as s_qc
+      from station where ref='s' and $v is not null and $v_qc not in ('M','S')
+  ),
+    d as (
+      select station_id,date,$v as d_v,$v_qc as d_qc
+        from station where ref='d'  and $v is not null and $v_qc not in ('M','S')
+    ),
+    j as (
+      select * from s full outer join d using (station_id,date)
+    ),
+  md as (
+  select date,count(*) as d_null from j where d_v is null group by date
+  ),
+  ms as (
+  select date,count(*) as s_null from j where s_v is null group by date
+  ),
+  df as (
+  select date,count(*) as diff from j where d_v != s_v group by date
+  )
+  select '$v' as var,* from ms full outer join md using (date) full outer join df using (date) order by date
+
+#+end_src
+
+#+RESULTS: date_by_var
+| var             | station_id | s_null | d_null | diff |
+|-----------------+------------+--------+--------+------|
+| day_air_tmp_max |          2 |        |      3 |      |
+| day_air_tmp_max |          5 |        |      2 |      |
+| day_air_tmp_max |          6 |        |      2 |      |
+| day_air_tmp_max |          7 |        |     26 |      |
+| day_air_tmp_max |         12 |    364 |        |      |
+| day_air_tmp_max |         13 |        |      2 |      |
+| day_air_tmp_max |         15 |        |      7 |      |
+| day_air_tmp_max |         35 |        |      2 |      |
+| day_air_tmp_max |         39 |        |      5 |      |
+| day_air_tmp_max |         41 |        |      2 |      |
+| day_air_tmp_max |         43 |        |      2 |      |
+| day_air_tmp_max |         44 |        |     47 |      |
+| day_air_tmp_max |         47 |        |      2 |      |
+| day_air_tmp_max |         52 |        |      3 |      |
+| day_air_tmp_max |         62 |    227 |        |      |
+| day_air_tmp_max |         64 |        |      3 |      |
+| day_air_tmp_max |         68 |    364 |        |      |
+| day_air_tmp_max |         70 |        |      2 |      |
+| day_air_tmp_max |         71 |        |      2 |      |
+| day_air_tmp_max |         75 |        |      2 |      |
+| day_air_tmp_max |         77 |        |      2 |      |
+| day_air_tmp_max |         78 |        |      4 |      |
+| day_air_tmp_max |         80 |        |      4 |      |
+| day_air_tmp_max |         83 |        |      2 |      |
+| day_air_tmp_max |         84 |        |      2 |      |
+| day_air_tmp_max |         87 |        |      2 |      |
+| day_air_tmp_max |         88 |        |      8 |      |
+| day_air_tmp_max |         90 |        |     75 |      |
+| day_air_tmp_max |         91 |        |      2 |      |
+| day_air_tmp_max |         99 |        |      2 |      |
+| day_air_tmp_max |        103 |        |      2 |      |
+| day_air_tmp_max |        104 |        |      2 |      |
+| day_air_tmp_max |        105 |        |     10 |      |
+| day_air_tmp_max |        106 |        |      2 |      |
+| day_air_tmp_max |        107 |        |      2 |      |
+| day_air_tmp_max |        113 |        |      3 |      |
+| day_air_tmp_max |        114 |        |      2 |      |
+| day_air_tmp_max |        116 |        |      4 |      |
+| day_air_tmp_max |        117 |        |      2 |      |
+| day_air_tmp_max |        124 |        |      2 |      |
+| day_air_tmp_max |        125 |        |      3 |      |
+| day_air_tmp_max |        126 |        |      2 |      |
+| day_air_tmp_max |        129 |        |      3 |      |
+| day_air_tmp_max |        131 |        |      2 |      |
+| day_air_tmp_max |        135 |        |      2 |      |
+| day_air_tmp_max |        136 |        |      2 |      |
+| day_air_tmp_max |        139 |        |     64 |      |
+| day_air_tmp_max |        140 |        |      4 |      |
+| day_air_tmp_max |        143 |        |      3 |      |
+| day_air_tmp_max |        144 |        |      2 |      |
+| day_air_tmp_max |        146 |        |      2 |      |
+| day_air_tmp_max |        147 |        |     12 |      |
+| day_air_tmp_max |        148 |     99 |        |      |
+| day_air_tmp_max |        150 |        |      2 |      |
+| day_air_tmp_max |        151 |        |      2 |      |
+| day_air_tmp_max |        152 |        |      3 |      |
+| day_air_tmp_max |        153 |        |      2 |      |
+| day_air_tmp_max |        157 |        |      2 |      |
+| day_air_tmp_max |        158 |        |      2 |      |
+| day_air_tmp_max |        159 |        |      3 |      |
+| day_air_tmp_max |        160 |        |     83 |      |
+| day_air_tmp_max |        163 |        |     65 |      |
+| day_air_tmp_max |        165 |        |      2 |      |
+| day_air_tmp_max |        170 |        |      2 |      |
+| day_air_tmp_max |        171 |        |      2 |      |
+| day_air_tmp_max |        173 |        |     26 |      |
+| day_air_tmp_max |        174 |        |      2 |      |
+| day_air_tmp_max |        175 |    364 |        |      |
+| day_air_tmp_max |        178 |        |      2 |      |
+| day_air_tmp_max |        179 |        |      2 |      |
+| day_air_tmp_max |        181 |        |     17 |      |
+| day_air_tmp_max |        182 |        |    143 |      |
+| day_air_tmp_max |        183 |        |      2 |      |
+| day_air_tmp_max |        184 |        |      7 |      |
+| day_air_tmp_max |        187 |        |      2 |      |
+| day_air_tmp_max |        189 |        |     14 |      |
+| day_air_tmp_max |        191 |        |      2 |      |
+| day_air_tmp_max |        192 |        |     79 |      |
+| day_air_tmp_max |        193 |        |    204 |      |
+| day_air_tmp_max |        194 |        |      2 |      |
+| day_air_tmp_max |        195 |        |      2 |      |
+| day_air_tmp_max |        197 |        |      4 |      |
+| day_air_tmp_max |        199 |        |     98 |      |
+| day_air_tmp_max |        200 |        |      2 |      |
+| day_air_tmp_max |        202 |        |     66 |      |
+| day_air_tmp_max |        204 |        |     14 |      |
+| day_air_tmp_max |        205 |        |      2 |      |
+| day_air_tmp_max |        206 |        |     20 |      |
+| day_air_tmp_max |        207 |        |      2 |      |
+| day_air_tmp_max |        208 |        |      2 |      |
+| day_air_tmp_max |        209 |        |      3 |      |
+| day_air_tmp_max |        210 |        |      2 |      |
+| day_air_tmp_max |        211 |        |      3 |      |
+| day_air_tmp_max |        212 |        |      5 |      |
+| day_air_tmp_max |        213 |        |      3 |      |
+| day_air_tmp_max |        214 |        |     13 |      |
+| day_air_tmp_max |        215 |        |     12 |      |
+| day_air_tmp_max |        216 |        |      4 |      |
+| day_air_tmp_max |        217 |        |      4 |      |
+| day_air_tmp_max |        218 |        |      4 |      |
+| day_air_tmp_max |        219 |     72 |        |      |
+| day_air_tmp_max |        220 |        |      4 |      |
+| day_air_tmp_max |        221 |        |      5 |      |
+| day_air_tmp_max |        222 |        |      4 |      |
+| day_air_tmp_max |        223 |        |      3 |      |
+| day_air_tmp_max |        224 |        |      3 |      |
+| day_air_tmp_max |        225 |        |      4 |      |
+| day_air_tmp_max |        226 |        |      4 |      |
+| day_air_tmp_max |        227 |        |      4 |      |
+| day_air_tmp_max |        228 |        |      4 |      |
+| day_air_tmp_max |        229 |        |      4 |      |
+| day_air_tmp_max |        231 |        |    170 |      |
+| day_air_tmp_max |        232 |        |    101 |      |
+| day_air_tmp_max |        233 |        |     68 |      |
+| day_air_tmp_max |        235 |        |     11 |      |
+| day_air_tmp_max |        236 |        |     66 |      |
+| day_air_tmp_max |        237 |        |      4 |      |
+| day_air_tmp_max |        239 |        |     29 |      |
+| day_air_tmp_max |        240 |        |      4 |      |
+| day_air_tmp_max |        241 |        |      4 |      |
+| day_air_tmp_max |        242 |        |      4 |      |
+| day_air_tmp_max |        243 |        |      4 |      |
+| day_air_tmp_max |        244 |        |      4 |      |
+| day_air_tmp_max |        245 |        |      6 |      |
+| day_air_tmp_max |        246 |        |      4 |      |
+| day_air_tmp_max |        247 |        |     68 |      |
+| day_air_tmp_max |        248 |        |      3 |      |
+| day_air_tmp_max |        249 |        |      4 |      |
+| day_air_tmp_max |        250 |        |      9 |      |
+| day_air_tmp_max |        251 |        |      4 |      |
+| day_air_tmp_max |        252 |        |      4 |      |
+| day_air_tmp_max |        253 |        |      3 |      |
+| day_air_tmp_max |        254 |        |      6 |      |
+| day_air_tmp_max |        256 |        |     12 |      |
+| day_air_tmp_max |        257 |        |      4 |      |
+| day_air_tmp_max |        258 |        |     28 |      |
+| day_air_tmp_max |        259 |        |     14 |      |
+| day_air_tmp_max |        260 |        |      9 |      |
+| day_air_tmp_max |        261 |        |      9 |      |
+| day_air_tmp_max |        262 |        |      4 |      |
+| day_air_tmp_max |        263 |        |      3 |      |
+| day_air_tmp_max |        264 |        |     11 |      |
+| day_air_tmp_max |        265 |        |      4 |      |
+| day_air_tmp_max |        266 |        |      4 |      |
+| day_air_tmp_max |        267 |        |     83 |      |
+| day_air_tmp_max |        268 |        |      5 |      |
+| day_air_tmp_max |        273 |        |     61 |      |
+
+#+CALL: date_by_var(v="day_wind_spd_avg")
+
+#+RESULTS:
+| var              |       date | s_null | d_null | diff |
+|------------------+------------+--------+--------+------|
+| day_wind_spd_avg | 2024-01-01 |      6 |      4 |      |
+| day_wind_spd_avg | 2024-01-02 |      6 |      4 |      |
+| day_wind_spd_avg | 2024-01-03 |      6 |      7 |      |
+| day_wind_spd_avg | 2024-01-04 |      6 |      5 |      |
+| day_wind_spd_avg | 2024-01-05 |      6 |      5 |      |
+| day_wind_spd_avg | 2024-01-06 |      6 |      5 |      |
+| day_wind_spd_avg | 2024-01-07 |      6 |      5 |      |
+| day_wind_spd_avg | 2024-01-08 |      6 |      5 |      |
+| day_wind_spd_avg | 2024-01-09 |      5 |      5 |      |
+| day_wind_spd_avg | 2024-01-10 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-01-11 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-01-12 |      5 |      3 |      |
+| day_wind_spd_avg | 2024-01-13 |      5 |      4 |      |
+| day_wind_spd_avg | 2024-01-14 |      6 |      4 |      |
+| day_wind_spd_avg | 2024-01-15 |      6 |      4 |      |
+| day_wind_spd_avg | 2024-01-16 |      6 |      4 |      |
+| day_wind_spd_avg | 2024-01-17 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-01-18 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-01-19 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-01-20 |      5 |      4 |      |
+| day_wind_spd_avg | 2024-01-21 |      6 |      4 |      |
+| day_wind_spd_avg | 2024-01-22 |      5 |      6 |      |
+| day_wind_spd_avg | 2024-01-23 |      6 |      4 |      |
+| day_wind_spd_avg | 2024-01-24 |      6 |      5 |      |
+| day_wind_spd_avg | 2024-01-25 |      6 |      4 |      |
+| day_wind_spd_avg | 2024-01-26 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-01-27 |      6 |      4 |      |
+| day_wind_spd_avg | 2024-01-28 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-01-29 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-01-30 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-01-31 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-02-01 |      6 |      5 |      |
+| day_wind_spd_avg | 2024-02-02 |      6 |      5 |      |
+| day_wind_spd_avg | 2024-02-03 |      6 |      4 |      |
+| day_wind_spd_avg | 2024-02-04 |      6 |      5 |      |
+| day_wind_spd_avg | 2024-02-05 |      6 |      6 |      |
+| day_wind_spd_avg | 2024-02-06 |      6 |      5 |      |
+| day_wind_spd_avg | 2024-02-07 |      6 |      5 |      |
+| day_wind_spd_avg | 2024-02-08 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-02-09 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-02-10 |      6 |      4 |      |
+| day_wind_spd_avg | 2024-02-11 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-02-12 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-02-13 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-02-14 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-02-15 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-02-16 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-02-17 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-02-18 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-02-19 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-02-20 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-02-21 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-02-22 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-02-23 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-02-24 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-02-25 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-02-26 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-02-27 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-02-28 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-02-29 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-03-01 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-03-02 |      6 |      4 |      |
+| day_wind_spd_avg | 2024-03-03 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-03-04 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-03-05 |      6 |      1 |      |
+| day_wind_spd_avg | 2024-03-06 |      5 |      2 |      |
+| day_wind_spd_avg | 2024-03-07 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-03-08 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-03-09 |      6 |      3 |      |
+| day_wind_spd_avg | 2024-03-10 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-03-11 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-03-12 |      6 |      2 |      |
+| day_wind_spd_avg | 2024-03-13 |      5 |      2 |      |
+| day_wind_spd_avg | 2024-03-14 |      5 |      2 |      |
+| day_wind_spd_avg | 2024-03-15 |      5 |      6 |      |
+| day_wind_spd_avg | 2024-03-16 |      5 |      2 |      |
+| day_wind_spd_avg | 2024-03-17 |      5 |      2 |      |
+| day_wind_spd_avg | 2024-03-18 |      5 |      1 |      |
+| day_wind_spd_avg | 2024-03-19 |      5 |      1 |      |
+| day_wind_spd_avg | 2024-03-20 |      5 |      1 |      |
+| day_wind_spd_avg | 2024-03-21 |      5 |      2 |      |
+| day_wind_spd_avg | 2024-03-22 |      5 |      1 |      |
+| day_wind_spd_avg | 2024-03-23 |      5 |      2 |      |
+| day_wind_spd_avg | 2024-03-24 |      5 |      4 |      |
+| day_wind_spd_avg | 2024-03-25 |      5 |      2 |      |
+| day_wind_spd_avg | 2024-03-26 |      5 |      5 |      |
+| day_wind_spd_avg | 2024-03-27 |      5 |      1 |      |
+| day_wind_spd_avg | 2024-03-28 |      5 |      1 |      |
+| day_wind_spd_avg | 2024-03-29 |      5 |      2 |      |
+| day_wind_spd_avg | 2024-03-30 |      5 |      3 |      |
+| day_wind_spd_avg | 2024-03-31 |      5 |      2 |      |
+| day_wind_spd_avg | 2024-04-01 |      5 |      1 |      |
+| day_wind_spd_avg | 2024-04-02 |      5 |      1 |      |
+| day_wind_spd_avg | 2024-04-03 |      5 |      1 |      |
+| day_wind_spd_avg | 2024-04-04 |      5 |      1 |      |
+| day_wind_spd_avg | 2024-04-05 |      5 |      1 |      |
+| day_wind_spd_avg | 2024-04-06 |      5 |      1 |      |
+| day_wind_spd_avg | 2024-04-07 |      5 |      1 |      |
+| day_wind_spd_avg | 2024-04-08 |      5 |      1 |      |
+| day_wind_spd_avg | 2024-04-09 |      4 |      1 |      |
+| day_wind_spd_avg | 2024-04-10 |      4 |      2 |      |
+| day_wind_spd_avg | 2024-04-11 |      4 |      1 |      |
+| day_wind_spd_avg | 2024-04-12 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-04-13 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-04-14 |      4 |      4 |      |
+| day_wind_spd_avg | 2024-04-15 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-04-16 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-04-17 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-04-18 |      3 |      3 |      |
+| day_wind_spd_avg | 2024-04-19 |      3 |      3 |      |
+| day_wind_spd_avg | 2024-04-20 |      3 |      4 |      |
+| day_wind_spd_avg | 2024-04-21 |      3 |      3 |      |
+| day_wind_spd_avg | 2024-04-22 |      4 |      4 |      |
+| day_wind_spd_avg | 2024-04-23 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-04-24 |      3 |      4 |      |
+| day_wind_spd_avg | 2024-04-25 |      4 |      2 |      |
+| day_wind_spd_avg | 2024-04-26 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-04-27 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-04-28 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-04-29 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-04-30 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-05-01 |      4 |      4 |      |
+| day_wind_spd_avg | 2024-05-02 |      4 |      4 |      |
+| day_wind_spd_avg | 2024-05-03 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-05-04 |      4 |      4 |      |
+| day_wind_spd_avg | 2024-05-05 |      4 |      4 |      |
+| day_wind_spd_avg | 2024-05-06 |      4 |      5 |      |
+| day_wind_spd_avg | 2024-05-07 |      4 |      4 |      |
+| day_wind_spd_avg | 2024-05-08 |      4 |      4 |      |
+| day_wind_spd_avg | 2024-05-09 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-05-10 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-05-11 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-05-12 |      4 |      4 |      |
+| day_wind_spd_avg | 2024-05-13 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-05-14 |      4 |      5 |      |
+| day_wind_spd_avg | 2024-05-15 |      4 |      5 |      |
+| day_wind_spd_avg | 2024-05-16 |      4 |      5 |      |
+| day_wind_spd_avg | 2024-05-17 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-05-18 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-05-19 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-05-20 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-05-21 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-05-22 |      4 |      4 |      |
+| day_wind_spd_avg | 2024-05-23 |      4 |      5 |      |
+| day_wind_spd_avg | 2024-05-24 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-05-25 |      4 |      5 |      |
+| day_wind_spd_avg | 2024-05-26 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-05-27 |      4 |      5 |      |
+| day_wind_spd_avg | 2024-05-28 |      4 |      5 |      |
+| day_wind_spd_avg | 2024-05-29 |      4 |      4 |      |
+| day_wind_spd_avg | 2024-05-30 |      4 |      4 |      |
+| day_wind_spd_avg | 2024-05-31 |      4 |      5 |      |
+| day_wind_spd_avg | 2024-06-01 |      4 |      5 |      |
+| day_wind_spd_avg | 2024-06-02 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-06-03 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-06-04 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-06-05 |      3 |      4 |      |
+| day_wind_spd_avg | 2024-06-06 |      3 |      3 |      |
+| day_wind_spd_avg | 2024-06-07 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-06-08 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-06-09 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-06-10 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-06-11 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-06-12 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-06-13 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-06-14 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-06-15 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-06-16 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-06-17 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-06-18 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-06-19 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-06-20 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-06-21 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-06-22 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-06-23 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-06-24 |      3 |      4 |      |
+| day_wind_spd_avg | 2024-06-25 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-06-26 |      3 |      4 |      |
+| day_wind_spd_avg | 2024-06-27 |      4 |      5 |      |
+| day_wind_spd_avg | 2024-06-28 |      4 |      5 |      |
+| day_wind_spd_avg | 2024-06-29 |      4 |      5 |      |
+| day_wind_spd_avg | 2024-06-30 |      4 |      4 |      |
+| day_wind_spd_avg | 2024-07-01 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-07-02 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-07-03 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-07-04 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-07-05 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-07-06 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-07-07 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-07-08 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-07-09 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-07-10 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-07-11 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-07-12 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-07-13 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-07-14 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-07-15 |      3 |      9 |      |
+| day_wind_spd_avg | 2024-07-16 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-07-17 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-07-18 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-07-19 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-07-20 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-07-21 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-07-22 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-07-23 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-07-24 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-07-25 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-07-26 |      4 |      8 |      |
+| day_wind_spd_avg | 2024-07-27 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-07-28 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-07-29 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-07-30 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-07-31 |      4 |      5 |      |
+| day_wind_spd_avg | 2024-08-01 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-08-02 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-08-03 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-08-04 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-08-05 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-08-06 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-08-07 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-08-08 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-08-09 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-08-10 |      4 |      8 |      |
+| day_wind_spd_avg | 2024-08-11 |      4 |      8 |      |
+| day_wind_spd_avg | 2024-08-12 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-08-13 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-08-14 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-08-15 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-08-16 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-08-17 |      4 |      9 |      |
+| day_wind_spd_avg | 2024-08-18 |      4 |      9 |      |
+| day_wind_spd_avg | 2024-08-19 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-08-20 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-08-21 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-08-22 |      4 |      9 |      |
+| day_wind_spd_avg | 2024-08-23 |      4 |      8 |      |
+| day_wind_spd_avg | 2024-08-24 |      4 |      9 |      |
+| day_wind_spd_avg | 2024-08-25 |      4 |      8 |      |
+| day_wind_spd_avg | 2024-08-26 |      4 |      8 |      |
+| day_wind_spd_avg | 2024-08-27 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-08-28 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-08-29 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-08-30 |      4 |      9 |      |
+| day_wind_spd_avg | 2024-08-31 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-09-01 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-09-02 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-09-03 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-09-04 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-09-05 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-09-06 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-09-07 |      3 |      4 |      |
+| day_wind_spd_avg | 2024-09-08 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-09-09 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-09-10 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-09-11 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-09-12 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-09-13 |      3 |      4 |      |
+| day_wind_spd_avg | 2024-09-14 |      3 |      4 |      |
+| day_wind_spd_avg | 2024-09-15 |      3 |      4 |      |
+| day_wind_spd_avg | 2024-09-16 |      3 |      4 |      |
+| day_wind_spd_avg | 2024-09-17 |      3 |      4 |      |
+| day_wind_spd_avg | 2024-09-18 |      3 |      4 |      |
+| day_wind_spd_avg | 2024-09-19 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-09-20 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-09-21 |      3 |      4 |      |
+| day_wind_spd_avg | 2024-09-22 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-09-23 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-09-24 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-09-25 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-09-26 |      4 |      5 |      |
+| day_wind_spd_avg | 2024-09-27 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-09-28 |      4 |      4 |      |
+| day_wind_spd_avg | 2024-09-29 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-09-30 |      4 |      2 |      |
+| day_wind_spd_avg | 2024-10-01 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-10-02 |      4 |      2 |      |
+| day_wind_spd_avg | 2024-10-03 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-10-04 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-10-05 |      4 |      4 |      |
+| day_wind_spd_avg | 2024-10-06 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-10-07 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-10-08 |      4 |      4 |      |
+| day_wind_spd_avg | 2024-10-09 |      4 |      2 |      |
+| day_wind_spd_avg | 2024-10-10 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-10-11 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-10-12 |      4 |      4 |      |
+| day_wind_spd_avg | 2024-10-13 |      4 |      3 |      |
+| day_wind_spd_avg | 2024-10-14 |      3 |      4 |      |
+| day_wind_spd_avg | 2024-10-15 |      3 |      3 |      |
+| day_wind_spd_avg | 2024-10-16 |      3 |      3 |      |
+| day_wind_spd_avg | 2024-10-17 |      3 |      4 |      |
+| day_wind_spd_avg | 2024-10-18 |      3 |      3 |      |
+| day_wind_spd_avg | 2024-10-19 |      3 |      3 |      |
+| day_wind_spd_avg | 2024-10-20 |      3 |      4 |      |
+| day_wind_spd_avg | 2024-10-21 |      3 |      3 |      |
+| day_wind_spd_avg | 2024-10-22 |      3 |      3 |      |
+| day_wind_spd_avg | 2024-10-23 |      3 |      4 |      |
+| day_wind_spd_avg | 2024-10-24 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-10-25 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-10-26 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-10-27 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-10-28 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-10-29 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-10-30 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-10-31 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-11-01 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-11-02 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-11-03 |        |    141 |      |
+| day_wind_spd_avg | 2024-11-04 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-11-05 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-11-06 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-11-07 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-11-08 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-11-09 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-11-10 |      3 |      6 |      |
+| day_wind_spd_avg | 2024-11-11 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-11-12 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-11-13 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-11-14 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-11-15 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-11-16 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-11-17 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-11-18 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-11-19 |        |    140 |      |
+| day_wind_spd_avg | 2024-11-20 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-11-21 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-11-22 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-11-23 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-11-24 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-11-25 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-11-26 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-11-27 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-11-28 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-11-29 |      4 |      7 |      |
+| day_wind_spd_avg | 2024-11-30 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-12-01 |      4 |      6 |      |
+| day_wind_spd_avg | 2024-12-02 |      3 |      5 |      |
+| day_wind_spd_avg | 2024-12-03 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-12-04 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-12-05 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-12-06 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-12-07 |      3 |      9 |      |
+| day_wind_spd_avg | 2024-12-08 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-12-09 |      3 |      9 |      |
+| day_wind_spd_avg | 2024-12-10 |      3 |     10 |      |
+| day_wind_spd_avg | 2024-12-11 |      3 |     10 |      |
+| day_wind_spd_avg | 2024-12-12 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-12-13 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-12-14 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-12-15 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-12-16 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-12-17 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-12-18 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-12-19 |      3 |      7 |      |
+| day_wind_spd_avg | 2024-12-20 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-12-21 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-12-22 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-12-23 |      3 |      9 |      |
+| day_wind_spd_avg | 2024-12-24 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-12-25 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-12-26 |      3 |      9 |      |
+| day_wind_spd_avg | 2024-12-27 |      3 |      8 |      |
+| day_wind_spd_avg | 2024-12-28 |      3 |      9 |      |
+| day_wind_spd_avg | 2024-12-29 |      3 |      9 |      |
+| day_wind_spd_avg | 2024-12-30 |      3 |     55 |      |
+| day_wind_spd_avg | 2024-12-31 |      3 |     47 |      |
+
+#+name: one_date_by_var
+#+begin_src sql :tangle no :var v="day_air_tmp_max" d="2024-07-02"
+    with s as (
+      select station_id,date,$v as s_v,$v_qc as s_qc
+        from station where ref='s' and $v is not null and $V_qc not in ('M','S')
+  ),
+      d as (
+        select station_id,date,$v as d_v,$v_qc as d_qc
+          from station where ref='d'  and $v is not null and $v_qc not in ('M','S')
+      ),
+      j as (
+        select * from s full outer join d using (station_id,date)
+      )
+    select * from j where date='$d' and (s_v is null or d_v is null or s_v!=d_v)
+
+#+end_src
+
+#+CALL: one_date_by_var(v="day_air_tmp_max",d="2024-07-02")
+
+#+RESULTS:
+| station_id |       date |  s_v | s_qc |  d_v | d_qc |
+|------------+------------+------+------+------+------|
+|         12 | 2024-07-02 |      |      |   39 | K    |
+|         68 | 2024-07-02 |      |      | 44.7 | K    |
+|         90 | 2024-07-02 | 29.8 | K    |      |      |
+|        139 | 2024-07-02 | 39.1 | K    |      |      |
+|        175 | 2024-07-02 |      |      | 46.9 | Y    |
+|        182 | 2024-07-02 | 38.6 | K    |      |      |
+|        193 | 2024-07-02 | 15.4 | K    |      |      |
+|        221 | 2024-07-02 |   51 | Y    |      |      |
+|        231 | 2024-07-02 | 18.3 | K    |      |      |
+
+#+CALL: one_date_by_var(v="day_wind_spd_avg",d="2024-07-02")
+
+#+RESULTS:
+| station_id |       date | s_v | s_qc | d_v | d_qc |
+|------------+------------+-----+------+-----+------|
+|         12 | 2024-07-02 |     |      |   2 | K    |
+|         68 | 2024-07-02 |     |      | 1.7 | K    |
+|         90 | 2024-07-02 | 1.5 | K    |     |      |
+|        139 | 2024-07-02 | 2.3 | R    |     |      |
+|        175 | 2024-07-02 |     |      | 2.4 | K    |
+|        182 | 2024-07-02 | 1.4 | K    |     |      |
+|        193 | 2024-07-02 | 2.9 | K    |     |      |
+|        221 | 2024-07-02 | 1.6 | K    |     |      |
+|        231 | 2024-07-02 | 0.4 | I    |     |      |
+
+#+name: station_by_var
+#+begin_src sql :tangle no :var v="day_air_tmp_max"
+  with s as (
+    select station_id,date,$v as s_v,$v_qc as s_qc
+      from station where ref='s' and $v is not null and $v_qc not in ('M','S')
+  ),
+    d as (
+      select station_id,date,$v as d_v,$v_qc as d_qc
+        from station where ref='d'  and $v is not null and $v_qc not in ('M','S')
+    ),
+    j as (
+      select * from s full outer join d using (station_id,date)
+    ),
+  md as (
+  select station_id,count(*) as d_null from j where d_v is null group by station_id
+  ),
+  ms as (
+  select station_id,count(*) as s_null from j where s_v is null group by station_id
+  ),
+  df as (
+  select station_id,count(*) as diff from j where d_v != s_v group by station_id
+  )
+  select '$v' as var,* from ms full outer join md using (station_id) full outer join df using (station_id) order by station_id
+#+end_src
+
+#+RESULTS: station_by_var
+| var             | station_id | s_null | d_null | diff |
+|-----------------+------------+--------+--------+------|
+| day_air_tmp_max |          2 |        |      3 |      |
+| day_air_tmp_max |          5 |        |      2 |      |
+| day_air_tmp_max |          6 |        |      2 |      |
+| day_air_tmp_max |          7 |        |     26 |      |
+| day_air_tmp_max |         12 |    364 |        |      |
+| day_air_tmp_max |         13 |        |      2 |      |
+| day_air_tmp_max |         15 |        |      7 |      |
+| day_air_tmp_max |         35 |        |      2 |      |
+| day_air_tmp_max |         39 |        |      5 |      |
+| day_air_tmp_max |         41 |        |      2 |      |
+| day_air_tmp_max |         43 |        |      2 |      |
+| day_air_tmp_max |         44 |        |     47 |      |
+| day_air_tmp_max |         47 |        |      2 |      |
+| day_air_tmp_max |         52 |        |      3 |      |
+| day_air_tmp_max |         62 |    227 |        |      |
+| day_air_tmp_max |         64 |        |      3 |      |
+| day_air_tmp_max |         68 |    364 |        |      |
+| day_air_tmp_max |         70 |        |      2 |      |
+| day_air_tmp_max |         71 |        |      2 |      |
+| day_air_tmp_max |         75 |        |      2 |      |
+| day_air_tmp_max |         77 |        |      2 |      |
+| day_air_tmp_max |         78 |        |      4 |      |
+| day_air_tmp_max |         80 |        |      4 |      |
+| day_air_tmp_max |         83 |        |      2 |      |
+| day_air_tmp_max |         84 |        |      2 |      |
+| day_air_tmp_max |         87 |        |      2 |      |
+| day_air_tmp_max |         88 |        |      8 |      |
+| day_air_tmp_max |         90 |        |     75 |      |
+| day_air_tmp_max |         91 |        |      2 |      |
+| day_air_tmp_max |         99 |        |      2 |      |
+| day_air_tmp_max |        103 |        |      2 |      |
+| day_air_tmp_max |        104 |        |      2 |      |
+| day_air_tmp_max |        105 |        |     10 |      |
+| day_air_tmp_max |        106 |        |      2 |      |
+| day_air_tmp_max |        107 |        |      2 |      |
+| day_air_tmp_max |        113 |        |      3 |      |
+| day_air_tmp_max |        114 |        |      2 |      |
+| day_air_tmp_max |        116 |        |      4 |      |
+| day_air_tmp_max |        117 |        |      2 |      |
+| day_air_tmp_max |        124 |        |      2 |      |
+| day_air_tmp_max |        125 |        |      3 |      |
+| day_air_tmp_max |        126 |        |      2 |      |
+| day_air_tmp_max |        129 |        |      3 |      |
+| day_air_tmp_max |        131 |        |      2 |      |
+| day_air_tmp_max |        135 |        |      2 |      |
+| day_air_tmp_max |        136 |        |      2 |      |
+| day_air_tmp_max |        139 |        |     64 |      |
+| day_air_tmp_max |        140 |        |      4 |      |
+| day_air_tmp_max |        143 |        |      3 |      |
+| day_air_tmp_max |        144 |        |      2 |      |
+| day_air_tmp_max |        146 |        |      2 |      |
+| day_air_tmp_max |        147 |        |     12 |      |
+| day_air_tmp_max |        148 |     99 |        |      |
+| day_air_tmp_max |        150 |        |      2 |      |
+| day_air_tmp_max |        151 |        |      2 |      |
+| day_air_tmp_max |        152 |        |      3 |      |
+| day_air_tmp_max |        153 |        |      2 |      |
+| day_air_tmp_max |        157 |        |      2 |      |
+| day_air_tmp_max |        158 |        |      2 |      |
+| day_air_tmp_max |        159 |        |      3 |      |
+| day_air_tmp_max |        160 |        |     83 |      |
+| day_air_tmp_max |        163 |        |     65 |      |
+| day_air_tmp_max |        165 |        |      2 |      |
+| day_air_tmp_max |        170 |        |      2 |      |
+| day_air_tmp_max |        171 |        |      2 |      |
+| day_air_tmp_max |        173 |        |     26 |      |
+| day_air_tmp_max |        174 |        |      2 |      |
+| day_air_tmp_max |        175 |    364 |        |      |
+| day_air_tmp_max |        178 |        |      2 |      |
+| day_air_tmp_max |        179 |        |      2 |      |
+| day_air_tmp_max |        181 |        |     17 |      |
+| day_air_tmp_max |        182 |        |    143 |      |
+| day_air_tmp_max |        183 |        |      2 |      |
+| day_air_tmp_max |        184 |        |      7 |      |
+| day_air_tmp_max |        187 |        |      2 |      |
+| day_air_tmp_max |        189 |        |     14 |      |
+| day_air_tmp_max |        191 |        |      2 |      |
+| day_air_tmp_max |        192 |        |     79 |      |
+| day_air_tmp_max |        193 |        |    204 |      |
+| day_air_tmp_max |        194 |        |      2 |      |
+| day_air_tmp_max |        195 |        |      2 |      |
+| day_air_tmp_max |        197 |        |      4 |      |
+| day_air_tmp_max |        199 |        |     98 |      |
+| day_air_tmp_max |        200 |        |      2 |      |
+| day_air_tmp_max |        202 |        |     66 |      |
+| day_air_tmp_max |        204 |        |     14 |      |
+| day_air_tmp_max |        205 |        |      2 |      |
+| day_air_tmp_max |        206 |        |     20 |      |
+| day_air_tmp_max |        207 |        |      2 |      |
+| day_air_tmp_max |        208 |        |      2 |      |
+| day_air_tmp_max |        209 |        |      3 |      |
+| day_air_tmp_max |        210 |        |      2 |      |
+| day_air_tmp_max |        211 |        |      3 |      |
+| day_air_tmp_max |        212 |        |      5 |      |
+| day_air_tmp_max |        213 |        |      3 |      |
+| day_air_tmp_max |        214 |        |     13 |      |
+| day_air_tmp_max |        215 |        |     12 |      |
+| day_air_tmp_max |        216 |        |      4 |      |
+| day_air_tmp_max |        217 |        |      4 |      |
+| day_air_tmp_max |        218 |        |      4 |      |
+| day_air_tmp_max |        219 |     72 |        |      |
+| day_air_tmp_max |        220 |        |      4 |      |
+| day_air_tmp_max |        221 |        |      5 |      |
+| day_air_tmp_max |        222 |        |      4 |      |
+| day_air_tmp_max |        223 |        |      3 |      |
+| day_air_tmp_max |        224 |        |      3 |      |
+| day_air_tmp_max |        225 |        |      4 |      |
+| day_air_tmp_max |        226 |        |      4 |      |
+| day_air_tmp_max |        227 |        |      4 |      |
+| day_air_tmp_max |        228 |        |      4 |      |
+| day_air_tmp_max |        229 |        |      4 |      |
+| day_air_tmp_max |        231 |        |    170 |      |
+| day_air_tmp_max |        232 |        |    101 |      |
+| day_air_tmp_max |        233 |        |     68 |      |
+| day_air_tmp_max |        235 |        |     11 |      |
+| day_air_tmp_max |        236 |        |     66 |      |
+| day_air_tmp_max |        237 |        |      4 |      |
+| day_air_tmp_max |        239 |        |     29 |      |
+| day_air_tmp_max |        240 |        |      4 |      |
+| day_air_tmp_max |        241 |        |      4 |      |
+| day_air_tmp_max |        242 |        |      4 |      |
+| day_air_tmp_max |        243 |        |      4 |      |
+| day_air_tmp_max |        244 |        |      4 |      |
+| day_air_tmp_max |        245 |        |      6 |      |
+| day_air_tmp_max |        246 |        |      4 |      |
+| day_air_tmp_max |        247 |        |     68 |      |
+| day_air_tmp_max |        248 |        |      3 |      |
+| day_air_tmp_max |        249 |        |      4 |      |
+| day_air_tmp_max |        250 |        |      9 |      |
+| day_air_tmp_max |        251 |        |      4 |      |
+| day_air_tmp_max |        252 |        |      4 |      |
+| day_air_tmp_max |        253 |        |      3 |      |
+| day_air_tmp_max |        254 |        |      6 |      |
+| day_air_tmp_max |        256 |        |     12 |      |
+| day_air_tmp_max |        257 |        |      4 |      |
+| day_air_tmp_max |        258 |        |     28 |      |
+| day_air_tmp_max |        259 |        |     14 |      |
+| day_air_tmp_max |        260 |        |      9 |      |
+| day_air_tmp_max |        261 |        |      9 |      |
+| day_air_tmp_max |        262 |        |      4 |      |
+| day_air_tmp_max |        263 |        |      3 |      |
+| day_air_tmp_max |        264 |        |     11 |      |
+| day_air_tmp_max |        265 |        |      4 |      |
+| day_air_tmp_max |        266 |        |      4 |      |
+| day_air_tmp_max |        267 |        |     83 |      |
+| day_air_tmp_max |        268 |        |      5 |      |
+| day_air_tmp_max |        273 |        |     61 |      |

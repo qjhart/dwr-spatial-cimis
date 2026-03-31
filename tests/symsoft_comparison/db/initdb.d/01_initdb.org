@@ -316,3 +316,47 @@ This can identify potentially bad days.
 #+RESULTS:
 | CREATE TABLE |
 |--------------|
+
+
+* Station
+
+#+begin_src sql
+create table if not exists station (
+ref char,
+x float,
+y float,
+z float,
+station_id integer,
+"date" date,
+day_asce_eto float,
+day_asce_eto_qc char,
+day_precip float,
+day_precip_qc char,
+day_sol_rad_avg float,
+day_sol_rad_avg_qc char,
+day_vap_pres_avg float,
+day_vap_pres_avg_qc char,
+day_air_tmp_max float,
+day_air_tmp_max_qc char,
+day_air_tmp_min float,
+day_air_tmp_min_qc char,
+day_air_tmp_avg float,
+day_air_tmp_avg_qc char,
+day_rel_hum_max float,
+day_rel_hum_max_qc char,
+day_rel_hum_min float,
+day_rel_hum_min_qc char,
+day_rel_hum_avg float,
+day_rel_hum_avg_qc char,
+day_dew_pnt float,
+day_dew_pnt_qc char,
+day_wind_spd_avg float,
+day_wind_spd_avg_qc char,
+primary key(ref,station_id,"date")
+);
+#+end_src
+
+#+begin_src sql :tangle no
+  \COPY station(ref,x,y,z,station_id,date,day_asce_eto,day_asce_eto_qc,day_precip,day_precip_qc,day_sol_rad_avg,day_sol_rad_avg_qc,day_vap_pres_avg,day_vap_pres_avg_qc,day_air_tmp_max,day_air_tmp_max_qc,day_air_tmp_min,day_air_tmp_min_qc,day_air_tmp_avg,day_air_tmp_avg_qc,day_rel_hum_max,day_rel_hum_max_qc,day_rel_hum_min,day_rel_hum_min_qc,day_rel_hum_avg,day_rel_hum_avg_qc,day_dew_pnt,day_dew_pnt_qc,day_wind_spd_avg,day_wind_spd_avg_qc) from dwr/stations_in.csv with csv
+  \COPY station(ref,station_id,x,y,z,date,day_asce_eto,day_asce_eto_qc,day_precip,day_precip_qc,day_sol_rad_avg,day_sol_rad_avg_qc,day_vap_pres_avg,day_vap_pres_avg_qc,day_air_tmp_max,day_air_tmp_max_qc,day_air_tmp_min,day_air_tmp_min_qc,day_air_tmp_avg,day_air_tmp_avg_qc,day_rel_hum_max,day_rel_hum_max_qc,day_rel_hum_min,day_rel_hum_min_qc,day_rel_hum_avg,day_rel_hum_avg_qc,day_dew_pnt,day_dew_pnt_qc,day_wind_spd_avg,day_wind_spd_avg_qc) from symsoft/stations_in.csv with csv
+#+end_src
