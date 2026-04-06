@@ -1,0 +1,191 @@
+#!/usr/bin/env bash
+
+: <<=cut
+=pod
+
+=head1  NAME
+
+spatial-cimis - Manage spatial cimis docker images, and deployment.
+
+=head1 SYNOPSIS
+
+spatial-cimis [--env=<env>] <command> <command> ...
+
+where <env> is one of dev, clean, deploy
+
+where <command> is one of: build, push, deploy
+
+=head1 DESCRIPTION
+
+spatial-cimis manages build and deployment processes for spatial cimis testing.
+   It tries to simplify the developers tasks based on the environment chosen.
+
+=head1 GLOBAL OPTIONS
+
+=over 4
+
+=item B<--env=I<env>>
+
+Set the environment, one of dev, clean, deploy, where dev is the
+default.
+
+=item B<--gcs=I<bucket>>
+
+Specify the Google Cloud Storage bucket to use for initialization.  This sets
+the C<GCS_BUCKET> parameter in the environment.
+
+=item B<--cloudsdk-active-config-name=I<name>>
+
+Specify the name of the gcloud configuration to use.  This is used to set the
+configuration for the duration of the command. Set to the empty string to use
+the default configuration.  Default is C<spatial-cimis>.
+
+=item B<-h|--help>
+
+Shows the manpage for the program. The help pages are embedded in the script and
+require the functions, C<pod2usage> and C<pod2text> to work properly.
+
+=back
+
+=cut
+
+# These Global Variables are the defaults values for the current setup.
+declare -g -A G=(
+  [project]="spatial-cimis"
+  [config]="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )/../config.json"
+  # Below you probably don't need to change
+  [base]="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )/.."
+  [shell_getopt]=${FLAGS_GETOPT_CMD:-getopt}
+  [git]="git -C $( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+  [cloudsdk_active_config_name]='spatial-cimis'
+);
+
+function G() {
+  jq -r "$*" <"${G[config]}"
+}
+
+function build() {
+  local org tag
+
+  read org tag \
+       <<<$(G "[.${G[env]}.org // .def.org,
+           .${G[env]}.tag // .def.tag ] | @tsv") #\
+
+  local git_tag="$(${G[git]} describe --always --dirty)"
+  # Tag is the git tag, unless specified
+  if [[ $tag == "__git__" ]]; then
+    tag="${git_tag}"
+  fi
+
+  local setup=
+
+  local cache_tag
+  case ${G[env]} in
+    dev)
+      cache_tag=dirty
+    ;; # Always build
+    clean )
+      if [[ "$tag" =~ "dirty" ]]; then
+        >&2 echo "tag=$tag: clean tags only where env=${G[env]}"
+        exit 1
+      fi
+      cache_tag=dirty
+      ;;
+    deploy )
+      if [[ "$tag" =~ "-" || "$tag" =~ "dirty" ]]; then
+        >&2 echo "tag=$tag: Annotated tags where env=${G[env]} "
+        exit 1
+      fi
+      cache_tag=$tag
+      ;;
+    *)
+      >&2 echo "Unknown env=${G[env]}"
+      exit 1
+      ;;
+  esac
+
+  cd "$(${G[git]} rev-parse --show-toplevel)"
+
+  for i in tests/goes18; do
+    local n=$(basename $i)
+    local image=$org/${n}:$tag
+
+    export DOCKER_BUILDKIT=1
+    $N docker build \
+	     --build-arg BUILDKIT_INLINE_CACHE=1 \
+       --build-arg ORG=${org} --build-arg TAG=${tag} \
+       -t $image \
+       --cache-from localhost/dwr-spatial-cimis/${n}:${cache_tag} ${i} || exit 1
+
+  done
+
+}
+
+function main.cmd() {
+  local opts;
+
+  if ! opts=$(${G[shell_getopt]} -o nv:d:lh --long base:,gcs:,env:,jq:,list-mounts,mount:,unstaged-ok,no-env,no-compose,no-service-account,cloudsdk-active-config-name:,no-test,dry-run,help -n "aggie-experts" -- "$@"); then
+    echo "Bad Command Options." >&2 ; exit 1 ; fi
+
+    eval set -- "$opts"
+
+    declare -A CMD=(
+      [setup_env]=1
+      [setup_compose]=1
+      [setup_service_account]=1
+      [unstaged_ok]=
+    )
+
+    while true; do
+	    case $1 in
+        --base) CMD[base]=$2; shift 2;;
+        --cloudsdk-active-config-name) CMD[cloudsdk_active_config_name]=$2; shift 2;;
+        --env) CMD[env]=$2; shift 2;;
+        --gcs) CMD[gcs]=$2; shift 2;;
+        --list-mounts | -l) CMD[list-mounts]=1; shift;;
+        --mount) CMD[mount]=$2; shift 2;;
+        --no-test) CMD[test_env]=; shift;;
+        --no-compose) CMD[setup_compose]=; shift;;
+        --service-account) CMD[setup_service_account]=1; shift;;
+        --no-service-account) CMD[setup_service_account]=; shift;;
+        --unstaged-ok) CMD[unstaged_ok]=1; shift;;
+        -h | --help) pod2text $0; exit 0;;
+        -n | --dry-run) CMD[dry-run]="echo"; shift;;
+	      -- ) shift; break;;
+	      *) shift; break;
+      esac
+    done
+
+    # command line over global
+    for i in "${!CMD[@]}"; do
+      G[$i]=${CMD[$i]};
+    done
+
+    # set the google cloud sdk config
+    if [[ -n $G[cloudsdk_active_config_name] ]]; then
+      export CLOUDSDK_ACTIVE_CONFIG_NAME=${G[cloudsdk_active_config_name]}
+    fi
+
+    # Now command(s)
+    for cmd in "$@"; do
+      shift
+      case $cmd in
+	      build ) # API requests
+          $cmd
+	        ;;
+
+        config | G )
+          G "$@" ;
+          exit 0
+          ;;
+
+        declare ) # informational requests
+          declare -p G;
+          exit 0
+          ;;
+        *) echo "Unknown command: $cmd"; exit 1;;
+      esac
+    done
+}
+main.cmd "$@"
+exit $?
